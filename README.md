@@ -44,10 +44,10 @@ python app.py
 ![Signup](screenshots/signup.png)
 
 ### Chat Interface
-![Chat](screenshots/chat.png)
+![Chat](screenshots/chat_ui.png)
 
 ### Admin Dashboard
-![Admin](screenshots/admin.png)
+![Admin](screenshots/admin_dashboard.png)
 
 ### Admin Analytics
 ![Admin Analytics](screenshots/admin_analytics.png)
