@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#121212;color:white;text-align:center;margin-top:100px;">
+
+<h2>Admin Login</h2>
+
+<input id="user" placeholder="Username"><br><br>
+<input id="pass" type="password" placeholder="Password"><br><br>
+
+<button onclick="login()">Login</button>
+
+<script>
+function login(){
+    fetch("/admin/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            username: document.getElementById("user").value,
+            password: document.getElementById("pass").value
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.success){
+            window.location.href="/admin";
+        } else {
+            alert("Invalid credentials");
+        }
+    });
+}
+</script>
+<script>
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    window.location.href = "/";
+};
+</script>
+</body>
+</html>

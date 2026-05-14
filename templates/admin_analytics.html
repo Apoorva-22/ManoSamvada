@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #121212;
+            color: white;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .charts {
+            display: flex;
+            gap: 20px;
+        }
+
+        .pie-container {
+            flex: 1;
+        }
+
+        .line-container {
+            flex: 2;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 300px !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>📊 Analytics Dashboard</h2>
+
+<div class="dashboard">
+
+    <!-- CARD -->
+    <div class="card">
+        <h3 id="username">Loading...</h3>
+        <p id="sessionsText"></p>
+        <p id="messagesText"></p>
+        <p id="dominantText"></p>
+        <p id="crisisText"></p>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+
+        <div class="pie-container">
+            <h3>Emotion Distribution</h3>
+            <canvas id="emotionChart"></canvas>
+        </div>
+
+        <div class="line-container">
+            <h3>Daily Chats</h3>
+            <canvas id="dailyChart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const username = params.get("user");
+
+let url = "/admin/analytics";
+if(username){
+    url += `?user=${username}`;
+}
+
+fetch(url)
+.then(res => res.json())
+.then(data => {
+
+    console.log("Analytics Data:", data);
+
+    // ✅ TEXT
+    document.getElementById("username").innerText =
+        data.username || "Unknown User";
+
+    document.getElementById("sessionsText").innerText =
+        "Sessions: " + (data.sessions || 0);
+
+    document.getElementById("messagesText").innerText =
+        "Total Messages: " + (data.chats || 0);
+
+    // ✅ dominant emotion (SAFE)
+    let dominant = "None";
+    if (data.emotions && data.emotions.length > 0) {
+        dominant = data.emotions
+            .sort((a,b)=>b.count-a.count)[0]
+            .emotion_label;
+    }
+
+    document.getElementById("dominantText").innerText =
+        "🔥 Dominant Emotion: " + dominant;
+
+    // ✅ crisis
+    document.getElementById("crisisText").innerText =
+        data.crisis > 0 ? "🚨 ALERT USER" : "Safe";
+
+
+    // 🔥 PIE CHART (SAFE CHECK)
+    if(data.emotions && data.emotions.length > 0){
+
+        let pielabels = data.emotions.map(e => e.emotion_label);
+        let pievalues = data.emotions.map(e => e.count);
+
+        new Chart(document.getElementById("emotionChart"), {
+            type: "pie",
+            data: {
+                labels: pielabels,
+                datasets: [{
+                    data: pievalues
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { color: "white" }
+                    }
+                }
+            }
+        });
+    }
+
+
+    // 🔥 LINE CHART (SAFE CHECK)
+    if(data.daily && data.daily.length > 0){
+
+        let linelabels = data.daily.map(d => d.date);
+        let linevalues = data.daily.map(d => d.count);
+
+        new Chart(document.getElementById("dailyChart"), {
+            type: 'line',
+            data: {
+                labels: linelabels,
+                datasets: [{
+                    label: "Chats per day",
+                    data: linevalues
+                }]
+            }
+        });
+    }
+
+})
+.catch(err => {
+    console.error("Analytics Error:", err);
+    document.getElementById("username").innerText = "Error loading data";
+});
+
+</script>
+</body>
+</html>

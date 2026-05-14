@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #121212;
+            color: white;
+            padding: 20px;
+        }
+
+        input {
+            padding: 8px;
+            width: 250px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #2196F3;
+            color: white;
+        }
+
+        .session {
+            border: 1px solid #333;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .session-header {
+            background: #222;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .messages {
+            display: none;
+            padding: 10px;
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 6px;
+            background: #1e1e1e;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<h2>🧠 Admin Dashboard 
+    <span id="crisisCount" style="color:red;"></span>
+</h2>
+
+<!-- 🔍 Controls -->
+
+<input type="text" id="search" placeholder="Search user...">
+<button onclick="toggleCrisis()" id="crisisBtn">Show Only Crisis</button>
+<button onclick="exportCSV()">Export CSV</button>
+<button onclick="viewAnalyticsFromSearch()">View Analytics</button>
+<button onclick="logout()">Logout</button>
+<div id="container"></div>
+
+<script>
+
+let allData = [];
+let showCrisisOnly = false;
+
+// 🔥 FETCH DATA
+fetch("/admin/data")
+.then(res => res.json())
+.then(data => {
+    allData = data;
+    render(data);
+});
+
+// 🔴 CRISIS COUNT
+fetch("/admin/crisis-count")
+.then(res => res.json())
+.then(data => {
+    document.getElementById("crisisCount").innerText = `🔴 ${data.count}`;
+});
+
+// 🔍 RENDER FUNCTION
+function render(data){
+
+    let container = document.getElementById("container");
+    container.innerHTML = "";
+
+    let grouped = {};   // ✅ पहले define करो
+
+    // 🔹 GROUPING
+    data.forEach(row => {
+
+    let searchText = document.getElementById("search").value.toLowerCase();
+
+    let username = (row.username || "Unknown User").toLowerCase();
+
+    if(searchText && !username.includes(searchText)) return;
+
+    let key = username + "_session_" + row.session_id;
+        if(!grouped[key]){
+            grouped[key] = [];
+        }
+
+        grouped[key].push(row);
+    });
+
+    
+    console.log("Total Sessions:", Object.keys(grouped).length);
+
+    // 🔹 LOOP
+    for(let key in grouped){
+
+        let session = grouped[key];
+
+        console.log("SESSION:", session);
+
+        let hasCrisis = session.some(r => Number(r.is_crisis_flag) == 1);
+
+        if(showCrisisOnly && !hasCrisis) continue;
+
+        let sessionDiv = document.createElement("div");
+        sessionDiv.classList.add("session");
+
+        let header = document.createElement("div");
+        header.classList.add("session-header");
+
+        let firstRow = session[0];
+
+        header.innerHTML = `
+            <span>
+                ${firstRow.username || "Unknown User"} | Session ${firstRow.session_id}
+            </span>
+            <span>▼</span>
+        `;
+
+        if(hasCrisis){
+            header.style.borderLeft = "5px solid red";
+        }
+
+        let messagesDiv = document.createElement("div");
+        messagesDiv.classList.add("messages");
+
+        header.onclick = () => {
+            messagesDiv.style.display =
+                messagesDiv.style.display === "none" ? "block" : "none";
+        };
+
+        let totalMessages = session.length;
+
+        let crisisCount = session.filter(r => Number(r.is_crisis_flag) == 1).length;
+
+        let emotionMap = {};
+        session.forEach(r => {
+            let e = r.emotion_label || "neutral";
+            emotionMap[e] = (emotionMap[e] || 0) + 1;
+        });
+
+        let dominantEmotion = Object.keys(emotionMap).length > 0
+            ? Object.keys(emotionMap).reduce((a,b)=> emotionMap[a] > emotionMap[b] ? a : b)
+            : "neutral";
+
+        let startTime = session[0].timestamp;
+        let endTime = session[session.length - 1].timestamp;
+
+        messagesDiv.innerHTML = `
+            <div class="message">
+                🕒 Start: ${startTime}<br>
+                🕒 End: ${endTime}<br><br>
+
+                💬 Messages: ${totalMessages}<br>
+                🔥 Emotion: ${dominantEmotion}<br>
+                ${crisisCount > 0 ? "🚨 Crisis Detected" : "Safe"}
+            </div>
+        `;
+
+        sessionDiv.appendChild(header);
+        sessionDiv.appendChild(messagesDiv);
+
+        container.appendChild(sessionDiv);
+    }
+}
+
+// 🔍 SEARCH
+document.getElementById("search").addEventListener("input", () => {
+    render(allData);
+});
+
+// 🔥 CRISIS TOGGLE
+function toggleCrisis(){
+
+    showCrisisOnly = !showCrisisOnly;
+
+    let btn = document.getElementById("crisisBtn");
+
+    if(showCrisisOnly){
+        btn.innerText = "Show All Sessions";
+    } else {
+        btn.innerText = "Show Only Crisis";
+    }
+
+    render(allData);
+}
+
+// 📁 EXPORT
+function exportCSV(){
+    window.location.href = "/admin/export";
+}
+
+// 📊 ANALYTICS
+function viewAnalyticsFromSearch(){
+    let username = document.getElementById("search").value.trim();
+
+    if(!username){
+        alert("Enter username first");
+        return;
+    }
+
+    window.location.href = `/admin/analytics-page?user=${username}`;
+}
+
+</script>
+<script>
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    window.location.href = "/admin/login";
+};
+</script>
+
+<script>
+function logout(){
+    window.location.href = "/admin/logout";
+}
+</script>
+</body>
+</html>

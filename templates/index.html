@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ManoSamvada</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- MAIN CHAT -->
+    <div class="main">
+
+        <!-- HEADER -->
+        <div class="topbar">
+            <div class="topbar-left">ManoSamvada</div>
+            <div class="topbar-right"></div>
+        </div>
+
+        <!-- CHAT BOX -->
+        <div id="chat-box" class="chat-box">
+
+            <!-- ✅ OPTIONAL WELCOME (will show if empty) -->
+            <div class="welcome">
+                <h3>👋 Hi, I’m here for you</h3>
+                <p>How are you feeling today?</p>
+
+                <div class="quick-options">
+                    <button onclick="quickMsg('I feel sad')">😔 Sad</button>
+                    <button onclick="quickMsg('I feel anxious')">😟 Anxious</button>
+                    <button onclick="quickMsg('I feel okay')">😊 Okay</button>
+                    <button onclick="quickMsg('Just want to talk')">💬 Talk</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TYPING INDICATOR -->
+        <div id="typing" class="typing hidden">
+            🤖 Typing<span class="dots"></span>
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-area">
+            <input id="msg"
+                   placeholder="Talk to me… I’m here for you 🩵"
+                   onkeydown="handleKey(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <span class="arrow">➤</span>
+                <span class="heart">💙</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <!-- 🔥 UPDATED SIDEBAR HEADER -->
+        <div class="sidebar-header">
+
+            <!-- TOP ROW -->
+            <div class="sidebar-top">
+                <img src="/static/logo.png" class="logo-img-large">
+
+                <button class="menu-btn" onclick="openMenu()">⋮</button>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="sidebar-actions">
+                <button onclick="startNewChat()">➕ New Chat</button>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search chats..."
+                    oninput="filterChats()"
+                />
+    
+            </div>
+
+            <!-- RECENTS LABEL -->
+            <div class="recent-label">Recents</div>
+
+        </div>
+
+        <!-- CHAT SESSIONS -->
+        <div id="sessions"></div>
+
+        <!-- PROFILE -->
+        <div class="profile-box">
+            <div class="avatar"></div>
+            <div class="profile-info">
+                <p class="name"></p>
+                <p class="email"></p>  
+                <p class="joined"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MENU MODAL -->
+    <div id="menuModal" class="modal hidden">
+        <div class="modal-content">
+
+            <h3>Menu</h3>
+
+            <button onclick="openAnalytics()">📊 Emotion Report</button>
+            <button onclick="openProfile()">👤 Profile</button>
+            <button onclick="logout()">🚪 Logout</button>
+
+            <button class="close-btn" onclick="closeMenu()">✖ Close</button>
+
+        </div>
+    </div>
+
+    <div id="ratingModal" class="modal">
+        <div class="modal-content rating-box">
+
+            <h3>⭐ Rate your experience</h3>
+
+            <div class="stars">
+            <span onclick="rate(1)">⭐</span>
+            <span onclick="rate(2)">⭐</span>
+            <span onclick="rate(3)">⭐</span>
+            <span onclick="rate(4)">⭐</span>
+            <span onclick="rate(5)">⭐</span>
+            </div>
+
+            <div class="rating-actions">
+            <button onclick="submitRating()">Submit</button>
+            <button onclick="skipRating()" class="skip-btn">Skip</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+<script>
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    window.location.href = "/login";
+};
+</script>
+
+</body>
+</html>

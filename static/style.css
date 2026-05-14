@@ -1,0 +1,652 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ================= APP LAYOUT ================= */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ================= MAIN CHAT ================= */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ================= TOP BAR ================= */
+.topbar {
+  height: 50px;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #333333;
+}
+
+/* REMOVE OLD HEADER */
+.header {
+  display: none;
+}
+
+/* ================= CHAT BOX ================= */
+.chat-box {
+  flex: 1;
+  display: flex;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+  padding-bottom: 20px;
+  background: linear-gradient(to bottom, #1e293b, #3b4c7a);
+}
+
+/* ================= CHAT BUBBLES ================= */
+.bubble {
+  max-width: 40%;
+  padding: 10px;
+  border-radius: 15px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  animation: fadeInMsg 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* USER */
+.bubble.user {
+  background: #ffffff;   /* pure white */
+  color: #111;
+  align-self: flex-end;
+  border-bottom-left-radius: 4px;
+}
+
+/* BOT */
+.bubble.bot {
+  align-self: flex-start;
+  background: #0c1c47;
+  color: white;
+  border-bottom-left-radius: 2px;
+
+}
+
+/* ANIMATION */
+@keyframes fadeInMsg {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= INPUT ================= */
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #011631;
+  position: sticky;
+  bottom: 0;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  
+}
+
+.input-area input:focus {
+  box-shadow: 0 0 5px rgba(1, 31, 59, 0.97);
+}
+
+.input-area button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  background: #7dd3fc;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #033344;
+
+}
+
+.input-area button::after {
+  content: "";
+}
+
+.input-area button:hover::after {
+  content: " 💙";
+}
+
+.input-area button:hover {
+  transform: scale(1.05);
+  background: #38bdf8; 
+}
+
+/* ================= TYPING ================= */
+.typing {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: #060606;
+  font-size: 14px;
+  align-items: center;
+  display: inline-flex;        /* 🔥 key fix */
+  align-self: flex-start;
+  max-width: fit-content;      /* 🔥 important */
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+
+/* dots animation */
+.dots::after {
+  content: "";
+  animation: dotsAnim 1.5s steps(3, end) infinite;
+}
+
+@keyframes dotsAnim {
+  0%   { content: ""; }
+  33%  { content: "."; }
+  66%  { content: ".."; }
+  100% { content: "..."; }
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 280px;
+  background: #111;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER STRUCTURE */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+/* TOP ROW */
+.sidebar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-img-large {
+  width: 40px;
+  height: 40px;
+}
+
+/* MENU BUTTON */
+.menu-btn {
+  background: none;
+  border: none;
+  color: rgb(249, 250, 250);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ACTION BUTTONS */
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sidebar-actions button {
+  width: 100%;
+  padding: 8px;
+  background: #1f1f1f;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-actions button:hover {
+  background: #2a2a2a;
+}
+
+/* RECENTS LABEL */
+.recent-label {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 13px;
+  color: #aaa;
+  border-top: 1px solid #222;
+}
+
+/* ================= CHAT LIST ================= */
+#sessions {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 🔥 UPGRADE: hover + active feel */
+.session-item {
+  padding: 10px;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.session-item:hover {
+  background: #262626;
+}
+
+.session-item.active {
+  background: #2a2a2a;
+}
+
+/* ================= PROFILE ================= */
+.profile-box {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+  padding: 14px;
+  border-top: 1px solid #333;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #7dd3fc;   /* 🩵 soft blue */
+  color: #033344;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* TEXT SIDE */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;               /* 🔥 line spacing */
+}
+
+/* NAME */
+.name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* EMAIL */
+.email {
+    font-size: 12px;
+    color: #aaa;
+}
+
+/* JOINED */
+.joined {
+    font-size: 12px;
+    color: #bbb;
+}
+
+/* ================= MODAL ================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+}
+
+.modal.active {
+  display: flex;
+}
+
+/* ================= MODAL UI UPGRADE ================= */
+
+.modal-content {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: black;
+    width: 350px;
+    margin: 15% auto;
+}
+
+/* Title */
+.modal-content h3 {
+    margin-bottom: 15px;
+    color: rgb(3, 3, 3);
+    
+}
+
+/* Buttons container */
+.modal-content button {
+    width: 100%;
+    margin: 6px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #2a2a2a;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+/* Hover effect */
+.modal-content button:hover {
+    background: #3a3a3a;
+}
+
+/* Special close button */
+.close-btn {
+    background: #ff4d4d !important;
+    text-align: center !important;
+}
+
+.close-btn:hover {
+    background: #ff3333 !important;
+}
+
+
+
+.hidden {
+    display: none !important;
+}
+
+.welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* vertical center */
+    align-items: center;       /* horizontal center */
+    text-align: center;
+    color: #aaa;               /* grey text */
+}
+
+.welcome h3 {
+    color: #ddd;
+    margin-bottom: 5px;
+    font-size: 20px;
+}
+
+.welcome p {
+    color: #aaa;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.quick-options button {
+    background: transparent;   /* no box */
+    border: none;
+    color: #aaa;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.25s ease;
+}
+
+/* ✨ HOVER EFFECT (button banega) */
+.quick-options button:hover {
+    background: #2a2a2a;
+    color: white;
+    transform: translateY(-2px);   /* ubhar effect */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.quick-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* SEND BUTTON BASE */
+/* BUTTON BASE */
+.send-btn {
+  margin-left: 10px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #7dd3fc;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+/* BOTH ICONS CENTER */
+.send-btn span {
+  position: absolute;
+  transition: 0.2s;
+}
+
+/* DEFAULT */
+.arrow {
+  color: #033344;
+  opacity: 1;
+}
+
+.heart {
+  opacity: 0;
+}
+
+/* HOVER */
+.send-btn:hover {
+  background: #38bdf8;
+  transform: scale(1.08);
+}
+
+.send-btn:hover .arrow {
+  opacity: 0;
+}
+
+.send-btn:hover .heart {
+  opacity: 1;
+}
+
+.rating-box {
+  text-align: center;
+}
+
+/* stars */
+.stars span {
+  font-size: 28px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.2s;
+}
+
+/* hover + active */
+.stars span:hover,
+.stars span.active {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* buttons */
+.rating-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.rating-actions button {
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.skip-btn {
+  background: #444;
+  color: white;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: #1f1f1f;
+  color: white;
+}
+
+.session-item {
+  transition: 0.2s;
+}
+
+#continueBtn:disabled {
+    background: grey;
+    cursor: not-allowed;
+}
+
+/* ================= DISCLAIMER MODAL FIX ================= */
+
+/* Force proper centering + override margin issue */
+.modal {
+    display: none; /* default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.7); /* darker overlay */
+    z-index: 9999;
+
+    justify-content: center;
+    align-items: center;
+    isolation: isolate;
+}
+
+/* When active */
+.modal.active {
+    display: flex;
+}
+
+/* Fix modal box positioning (REMOVE margin issue) */
+.modal-content {
+    margin: 0 !important;   /* 🔥 override your old 15% margin */
+    width: 420px;
+    max-width: 90%;
+
+    background: #ffffff;   /* better readability */
+    color: #111;
+
+    border-radius: 14px;
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+
+    animation: modalPop 0.3s ease;
+    position: relative;
+    z-index: 10000;
+}
+
+/* Smooth animation */
+@keyframes modalPop {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Fix text readability */
+.modal-content p {
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-content * {
+    text-shadow: none !important;
+    font-style: normal !important;
+}
+
+/* Checkbox styling */
+.modal-content label {
+    display: block;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #222;
+}
+
+/* Button layout fix */
+.modal-content button {
+    margin-top: 10px;
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Continue button */
+#continueBtn {
+    background: #4CAF50 !important;
+    color: white;
+}
+
+/* Cancel button override */
+.modal-content button:last-child {
+    background: #ccc !important;
+    color: black;
+}
+
+/* Blur background when modal open */
+body.modal-open .bg,
+body.modal-open .overlay,
+body.modal-open .container {
+    filter: blur(5px);
+}

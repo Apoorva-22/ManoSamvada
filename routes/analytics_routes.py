@@ -1,0 +1,179 @@
+from flask import Blueprint, request, jsonify, session, redirect, render_template
+from services.db_service import get_db
+
+analytics_bp = Blueprint("analytics", __name__)
+
+@analytics_bp.route("/admin/analytics")
+def analytics():
+
+    if "admin" not in session:
+        return jsonify({"error": "Unauthorized"})
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    username = request.args.get("user")
+
+    # ✅ DEFAULT VALUES (IMPORTANT FIX)
+    sessions = 0
+    chats = 0
+    crisis = 0
+    emotions = []
+    daily_data = []
+
+    # 🔥 USER SPECIFIC
+    if username:
+
+        cursor.execute("SELECT user_id FROM user WHERE username=%s", (username,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"error": "User not found"})
+
+        user_id = user["user_id"]
+
+        # sessions
+        cursor.execute("""
+            SELECT COUNT(DISTINCT session_id) as total
+            FROM conversation_session
+            WHERE user_id=%s
+        """, (user_id,))
+        sessions = cursor.fetchone()["total"]
+
+        # chats
+        cursor.execute("""
+            SELECT COUNT(*) as total
+            FROM chat_log cl
+            JOIN conversation_session cs ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+        """, (user_id,))
+        chats = cursor.fetchone()["total"]
+
+        # crisis
+        cursor.execute("""
+            SELECT COUNT(*) as total
+            FROM chat_log cl
+            JOIN conversation_session cs ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s AND cl.is_crisis_flag=1
+        """, (user_id,))
+        crisis = cursor.fetchone()["total"]
+
+        # emotions
+        cursor.execute("""
+            SELECT emotion_label, COUNT(*) as count
+            FROM chat_log cl
+            JOIN conversation_session cs ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+            GROUP BY emotion_label
+        """, (user_id,))
+        emotions = cursor.fetchall()
+
+        # daily
+        cursor.execute("""
+            SELECT DATE(cl.timestamp) as date, COUNT(*) as count
+            FROM chat_log cl
+            JOIN conversation_session cs ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+            GROUP BY DATE(cl.timestamp)
+            ORDER BY date
+        """, (user_id,))
+        daily_data = cursor.fetchall()
+
+    # 🔥 RETURN ALWAYS SAFE
+    cursor.close()
+    db.close()
+
+    return jsonify({
+        "username": username or "All Users",
+        "sessions": sessions,
+        "chats": chats,
+        "crisis": crisis,
+        "emotions": emotions,
+        "daily": daily_data
+    })
+
+
+@analytics_bp.route("/admin/analytics-page")
+def analytics_page():
+    if "admin" not in session:
+        return redirect("/admin/login")
+    
+    return render_template("admin_analytics.html")
+
+@analytics_bp.route("/user/analytics")
+def user_analytics_page():
+
+    if "user" not in session:
+        return redirect("/login")
+
+    return render_template("user_analytics.html")
+
+
+@analytics_bp.route("/user/analytics-data")
+def user_analytics_data():
+
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"})
+
+    user_id = session["user"]
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # 🔹 Total Sessions
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM conversation_session
+        WHERE user_id=%s
+    """, (user_id,))
+    sessions = cursor.fetchone()["total"]
+
+    # 🔹 Total Messages
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM chat_log cl
+        JOIN conversation_session cs ON cl.session_id = cs.session_id
+        WHERE cs.user_id=%s
+    """, (user_id,))
+    chats = cursor.fetchone()["total"]
+
+    # 🔹 Emotion Distribution
+    cursor.execute("""
+        SELECT emotion_label, COUNT(*) as count
+        FROM chat_log cl
+        JOIN conversation_session cs ON cl.session_id = cs.session_id
+        WHERE cs.user_id=%s
+        GROUP BY emotion_label
+    """, (user_id,))
+    emotions = cursor.fetchall()
+
+    # 🔹 Crisis Count
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM chat_log cl
+        JOIN conversation_session cs ON cl.session_id = cs.session_id
+        WHERE cs.user_id=%s AND cl.is_crisis_flag=1
+    """, (user_id,))
+    crisis = cursor.fetchone()["total"]
+
+    # 🔹 Daily Trend
+    cursor.execute("""
+        SELECT DATE(cl.timestamp) as date, COUNT(*) as count
+        FROM chat_log cl
+        JOIN conversation_session cs ON cl.session_id = cs.session_id
+        WHERE cs.user_id=%s
+        GROUP BY DATE(cl.timestamp)
+        ORDER BY date
+    """, (user_id,))
+    daily = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return jsonify({
+        "sessions": sessions,
+        "chats": chats,
+        "emotions": emotions,
+        "crisis": crisis,
+        "daily": daily
+    })

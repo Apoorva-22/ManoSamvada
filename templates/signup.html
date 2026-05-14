@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Signup - Manosamvad</title>
+
+<style>
+body {
+    font-family: Arial;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #121212;
+    color: white;
+}
+
+.box {
+    background: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    width: 330px;
+    text-align: center;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1976D2;
+}
+
+button:disabled {
+    background: grey;
+    cursor: not-allowed;
+}
+
+.small {
+    font-size: 12px;
+    color: #ccc;
+    text-align: left;
+    margin-left: 15px;
+}
+
+.eye {
+    cursor: pointer;
+    position: absolute;
+    margin-left: -30px;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Sign Up</h2>
+
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+
+    <div style="position:relative;">
+        <input type="password" id="password" placeholder="Password">
+        <span class="eye" onclick="togglePass()">👁</span>
+    </div>
+
+    <div class="small">
+        * At least 6 characters<br>
+        * Must include a number & a letter
+    </div>
+
+    <input type="date" id="dob">
+
+    <!-- OTP FLOW -->
+    <button onclick="sendOTP()">Send Email OTP</button>
+
+    <input type="text" id="otp" placeholder="Enter OTP">
+
+    <button onclick="verifyOTP()">Verify OTP</button>
+
+    <button id="signupBtn" onclick="signup()" disabled>Create Account</button>
+</div>
+
+<script>
+
+let otpVerified = false;
+
+function togglePass(){
+    let pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+}
+
+// 🔥 Password validation
+function isValidPassword(password){
+    return password.length >= 6 &&
+           /[a-zA-Z]/.test(password) &&
+           /[0-9]/.test(password);
+}
+
+// 🔥 Send OTP
+function sendOTP(){
+    let email = document.getElementById("email").value;
+
+    if(!email){
+        alert("Enter email first");
+        return;
+    }
+
+    fetch("/send-otp", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email})
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+}
+
+// 🔥 Verify OTP
+function verifyOTP(){
+    let email = document.getElementById("email").value;
+    let otp = document.getElementById("otp").value;
+
+    if(!otp){
+        alert("Enter OTP");
+        return;
+    }
+
+    fetch("/verify-otp", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, otp})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            otpVerified = true;
+            alert("✅ OTP Verified!");
+            document.getElementById("signupBtn").disabled = false;
+        } else {
+            alert("❌ Invalid OTP");
+        }
+    });
+}
+
+// 🔥 Signup
+function signup(){
+
+    let name = document.getElementById("name").value;
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    let email = document.getElementById("email").value;
+    let dob = document.getElementById("dob").value;
+
+    if(!name || !username || !password || !email || !dob){
+        alert("Please fill all fields");
+        return;
+    }
+
+    if(!isValidPassword(password)){
+        alert("Password must have 6+ chars, number & letter");
+        return;
+    }
+
+    let data = { name, username, password, email, dob };
+
+    fetch("/signup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("🎉 Account Created Successfully!");
+            window.location.href = "/chat-page";
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+</script>
+<script>
+fetch("/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+})
+.then(res => res.json())
+.then(res => {
+
+    if(res.status === "error"){
+        alert(res.message);
+        window.location.href = "/login";
+    } 
+    else {
+        alert("Signup successful!");
+        window.location.href = "/login";
+    }
+
+});
+</script>
+<script>
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    window.location.href = "/";
+};
+</script>
+</body>
+</html>
