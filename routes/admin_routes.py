@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session, redirect, render_template, Response,url_for
 from services.db_service import get_db
 from werkzeug.security import check_password_hash
+from psycopg2.extras import RealDictCursor
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -12,7 +13,7 @@ def admin_login():
 
     # POST logic
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     data = request.get_json(force=True)
 
@@ -42,7 +43,7 @@ def admin_data():
     search = request.args.get("search", "").strip()
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     if search:
         cursor.execute("""
@@ -97,7 +98,7 @@ def crisis_count():
         return jsonify({"error": "Unauthorized"})
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("SELECT COUNT(*) as count FROM chat_log WHERE is_crisis_flag=1")
     result = cursor.fetchone()
@@ -115,7 +116,7 @@ def export():
         return "Unauthorized", 403
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
         SELECT u.username, cs.session_id,
@@ -151,7 +152,7 @@ def add_keyword():
         return jsonify({"error":"Unauthorized"})
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     data = request.json
 
