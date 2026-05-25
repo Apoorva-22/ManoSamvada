@@ -1,6 +1,6 @@
 import re
 from services.db_service import get_db
-
+from psycopg2.extras import RealDictCursor
 
 def normalize_text(text):
     text = text.lower()
@@ -18,7 +18,7 @@ def check_crisis(msg):
     normalized_msg = normalize_text(msg)
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
         SELECT keyword_text, severity_level 
