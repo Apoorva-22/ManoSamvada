@@ -578,3 +578,36 @@ function signupUser(data){
         alert("Server error");
     });
 }
+
+async function sendOTP() {
+
+    const btn = document.getElementById("sendOtpBtn");
+
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+
+    try {
+        const email = document.getElementById("email").value;
+
+        const res = await fetch("/send-otp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+    } catch (err) {
+        console.error(err);
+        alert("OTP send failed");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Email OTP";
+    }
+}
