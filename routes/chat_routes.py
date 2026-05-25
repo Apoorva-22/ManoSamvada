@@ -4,6 +4,7 @@ from services.db_service import get_db
 from services.emotion_service import detect_emotion
 from services.crisis_service import check_crisis
 from services.llm_service import get_llm_response, generate_topic
+from psycopg2.extras import RealDictCursor
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -18,7 +19,7 @@ def chat_page():
 def start_session():
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     user_id = session.get("user")
     if user_id == "guest":
@@ -46,7 +47,7 @@ def chat():
         return jsonify({"reply": "Unauthorized"})
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     if not session.get("chat_session"):
 
@@ -165,7 +166,7 @@ def get_user():
         return {"name": "Guest", "username": "guest", "joined": ""}
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
         SELECT name, username, email, created_at
@@ -195,7 +196,7 @@ def get_session(session_id):
         return jsonify([])
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
         SELECT message_text, bot_response
@@ -229,7 +230,7 @@ def get_sessions():
         return jsonify([])
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     user_id = session.get("user")
 
@@ -256,7 +257,7 @@ def search_sessions():
     query = request.args.get("q", "").lower()
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     user_id = session.get("user")
 
