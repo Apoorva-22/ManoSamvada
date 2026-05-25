@@ -196,27 +196,7 @@ function signup(){
     });
 }
 
-</script>
-<script>
-fetch("/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-})
-.then(res => res.json())
-.then(res => {
 
-    if(res.status === "error"){
-        alert(res.message);
-        window.location.href = "/login";
-    } 
-    else {
-        alert("Signup successful!");
-        window.location.href = "/login";
-    }
-
-});
-</script>
 <script>
 history.pushState(null, null, location.href);
 window.onpopstate = function () {
