@@ -66,6 +66,15 @@ def init_db():
     ADD COLUMN IF NOT EXISTS name VARCHAR(100);
     
     ALTER TABLE "user"
+    ADD COLUMN IF NOT EXISTS username VARCHAR(100);
+    
+    ALTER TABLE "user"
+    ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+    
+    ALTER TABLE "user"
+    ADD COLUMN IF NOT EXISTS password_hash TEXT;
+    
+    ALTER TABLE "user"
     ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
     
     ALTER TABLE conversation_session
