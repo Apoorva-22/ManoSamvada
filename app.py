@@ -12,6 +12,59 @@ from routes.chat_routes import chat_bp
 from routes.admin_routes import admin_bp
 from routes.analytics_routes import analytics_bp
 
+from services.db_service import get_db
+from psycopg2.extras import RealDictCursor
+
+def init_db():
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS "user" (
+        user_id SERIAL PRIMARY KEY,
+        username VARCHAR(100) UNIQUE,
+        email VARCHAR(255),
+        password_hash TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS conversation_session (
+        session_id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS crisis_keyword (
+        keyword_id SERIAL PRIMARY KEY,
+        keyword_text TEXT,
+        severity_level VARCHAR(20),
+        admin_id INT
+    );
+
+    CREATE TABLE IF NOT EXISTS chat_log (
+        chat_id SERIAL PRIMARY KEY,
+        session_id INT,
+        message_text TEXT,
+        bot_response TEXT,
+        emotion_label VARCHAR(50),
+        sentiment_score FLOAT,
+        is_crisis_flag BOOLEAN,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS admin (
+        admin_id SERIAL PRIMARY KEY,
+        username VARCHAR(100) UNIQUE,
+        password_hash TEXT
+    );
+    """)
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+
+init_db()
+
 app.register_blueprint(auth_bp)
 app.register_blueprint(chat_bp)
 app.register_blueprint(admin_bp)
