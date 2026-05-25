@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, session, redirect, render_template
 from services.db_service import get_db
+from psycopg2.extras import RealDictCursor
 
 analytics_bp = Blueprint("analytics", __name__)
 
@@ -10,7 +11,7 @@ def analytics():
         return jsonify({"error": "Unauthorized"})
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     username = request.args.get("user")
 
@@ -118,8 +119,8 @@ def user_analytics_data():
     user_id = session["user"]
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+    
     # 🔹 Total Sessions
     cursor.execute("""
         SELECT COUNT(*) as total
