@@ -80,7 +80,7 @@ def init_db():
     ALTER TABLE conversation_session
     ADD COLUMN IF NOT EXISTS topic TEXT;
     """)
-    
+    cursor.execute('TRUNCATE TABLE "user" RESTART IDENTITY CASCADE;')
     db.commit()
     cursor.close()
     db.close()
