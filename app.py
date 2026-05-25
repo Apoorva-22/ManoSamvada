@@ -21,17 +21,20 @@ def init_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS "user" (
-        user_id SERIAL PRIMARY KEY,
-        username VARCHAR(100) UNIQUE,
-        email VARCHAR(255),
-        password_hash TEXT
-    );
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    username VARCHAR(100) UNIQUE,
+    email VARCHAR(255),
+    password_hash TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
     CREATE TABLE IF NOT EXISTS conversation_session (
-        session_id SERIAL PRIMARY KEY,
-        user_id VARCHAR(100),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    session_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(100),
+    topic TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
     CREATE TABLE IF NOT EXISTS crisis_keyword (
         keyword_id SERIAL PRIMARY KEY,
@@ -58,6 +61,17 @@ def init_db():
     );
     """)
 
+    cursor.execute("""
+    ALTER TABLE "user"
+    ADD COLUMN IF NOT EXISTS name VARCHAR(100);
+    
+    ALTER TABLE "user"
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    
+    ALTER TABLE conversation_session
+    ADD COLUMN IF NOT EXISTS topic TEXT;
+    """)
+    
     db.commit()
     cursor.close()
     db.close()
