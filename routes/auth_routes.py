@@ -3,6 +3,7 @@ from services.db_service import get_db
 from services.otp_service import send_email_otp, otp_store
 from werkzeug.security import generate_password_hash, check_password_hash
 import time
+from psycopg2.extras import RealDictCursor
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -19,7 +20,7 @@ def login():
     data = request.get_json(force=True)
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("SELECT * FROM user WHERE username=%s", (data["username"],))
     user = cursor.fetchone()
@@ -43,7 +44,7 @@ def signup():
     data = request.get_json(force=True)
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     username = data["username"].lower().strip()
     email = data["email"].lower().strip()
@@ -126,7 +127,7 @@ def get_sessions():
         return jsonify([])
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
 
     user_id = session.get("user")
 
