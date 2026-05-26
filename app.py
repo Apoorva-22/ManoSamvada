@@ -18,8 +18,7 @@ def init_db():
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
     # TEMP: one-time reset users table
-    cursor.execute("DROP TABLE IF EXISTS users CASCADE;")
-    cursor.execute("DROP TABLE IF EXISTS conversation_session CASCADE;")
+    
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
