@@ -170,7 +170,7 @@ def get_user():
 
     cursor.execute("""
         SELECT name, username, email, created_at
-        FROM user
+        FROM users
         WHERE user_id = %s
     """, (session["user"],))
 
