@@ -159,36 +159,41 @@ def chat():
     })
 
 
-@chat_bp.route("/get-user")
+@chat_bp.route("/get-user", methods=["GET"])
 def get_user():
 
-    if "user" not in session:
-        return {"name": "Guest", "username": "guest", "joined": ""}
+    user_id = session.get("user")
+
+    if not user_id or user_id == "guest":
+        return jsonify({
+            "name": "User",
+            "username": "user",
+            "email": "",
+            "dob": "",
+            "created_at": ""
+        })
 
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
-        SELECT name, username, email, created_at
+        SELECT
+            name,
+            username,
+            email,
+            dob,
+            created_at
         FROM users
         WHERE user_id = %s
-    """, (session["user"],))
+    """, (user_id,))
 
     user = cursor.fetchone()
 
     cursor.close()
     db.close()
 
-    if not user:
-        return {"name": "User", "username": "user", "joined": ""}
-
-    return {
-    "name": user["name"] if user["name"] else user["username"],
-    "username": user["username"],
-    "email": user["email"],   # ✅ NEW
-    "joined": str(user["created_at"])
-}
-
+    return jsonify(user or {})
+    
 @chat_bp.route("/get-session/<int:session_id>")
 def get_session(session_id):
 
