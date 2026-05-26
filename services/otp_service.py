@@ -1,13 +1,12 @@
 import os
 import random
-import smtplib
 import time
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
 otp_store = {}
 
@@ -20,35 +19,36 @@ def send_email_otp(email):
         "time": time.time()
     }
 
-    try:
-        server = smtplib.SMTP("smtp-relay.brevo.com", 587)
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json"
+    }
 
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
+    payload = {
+        "sender": {
+            "name": "ManoSamvada",
+            "email": "manosamvad.app@gmail.com"
+        },
+        "to": [
+            {
+                "email": email
+            }
+        ],
+        "subject": "Your OTP - ManoSamvada",
+        "htmlContent":
+            f"<h3>Your OTP is {otp}</h3>"
+            f"<p>Valid for 5 minutes.</p>"
+    }
 
-        server.login(
-            EMAIL_USER,
-            EMAIL_PASS
-        )
+    r = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        headers=headers,
+        json=payload,
+        timeout=15
+    )
 
-        message = f"""Subject: ManoSamvada OTP
+    print("Brevo:", r.status_code, r.text)
 
-Your OTP is {otp}
-
-Valid for 5 minutes.
-"""
-
-        server.sendmail(
-            EMAIL_USER,
-            email,
-            message
-        )
-
-        server.quit()
-
-        print("OTP sent:", otp)
-
-    except Exception as e:
-        print("Email Error:", e)
-        raise e
+    if r.status_code >= 400:
+        raise Exception(r.text)
