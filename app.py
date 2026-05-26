@@ -21,10 +21,10 @@ def init_db():
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
     # one-time rebuild user table
-    cursor.execute('DROP TABLE IF EXISTS "user" CASCADE;')
+    cursor.execute('DROP TABLE IF EXISTS "users" CASCADE;')
 
     cursor.execute("""
-    CREATE TABLE "user" (
+    CREATE TABLE "users" (
         user_id SERIAL PRIMARY KEY,
         name VARCHAR(100),
         username VARCHAR(100) UNIQUE,
