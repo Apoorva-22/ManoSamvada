@@ -33,7 +33,7 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS conversation_session (
         session_id SERIAL PRIMARY KEY,
-        user_id VARCHAR(100),
+        user_id INT,
         topic TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -62,7 +62,7 @@ def init_db():
         password_hash TEXT
     );
     """)
-
+    cursor.execute('DROP TABLE IF EXISTS "user" CASCADE;')
     cursor.execute("""
     ALTER TABLE "user"
     ADD COLUMN IF NOT EXISTS name VARCHAR(100);
