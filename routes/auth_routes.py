@@ -94,8 +94,29 @@ def signup():
 # 📩 OTP SEND
 @auth_bp.route("/send-otp", methods=["POST"])
 def send_otp():
-    send_email_otp(request.json["email"])
-    return jsonify({"message": "OTP sent"})
+
+    email = request.json["email"]
+
+    print("OTP request for:", email)
+
+    try:
+        send_email_otp(email)
+
+        print("OTP mail sent successfully")
+
+        return jsonify({
+            "success": True,
+            "message": "OTP sent"
+        })
+
+    except Exception as e:
+
+        print("OTP MAIL ERROR:", str(e))
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
 
 # ✅ OTP VERIFY
 @auth_bp.route("/verify-otp", methods=["POST"])
