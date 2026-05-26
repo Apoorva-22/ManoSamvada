@@ -71,12 +71,12 @@ button:disabled {
 <div class="box">
     <h2>Sign Up</h2>
 
-    <input type="text" id="name" placeholder="Full Name">
-    <input type="text" id="username" placeholder="Username">
-    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="name" placeholder="Full Name *">
+    <input type="text" id="username" placeholder="Username *">
+    <input type="email" id="email" placeholder="Email *">
 
     <div style="position:relative;">
-        <input type="password" id="password" placeholder="Password">
+        <input type="password" id="password" placeholder="Password *">
         <span class="eye" onclick="togglePass()">👁</span>
     </div>
 
@@ -85,7 +85,7 @@ button:disabled {
         * Must include a number & a letter
     </div>
 
-    <input type="date" id="dob">
+    <input type="date" id="dob" required>
 
     <button
         id="sendOtpBtn"
@@ -102,7 +102,20 @@ button:disabled {
 </div>
 
 <script>
+document.getElementById("username")
+.addEventListener("input", function () {
 
+    this.value = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "");
+});
+
+function isValidEmail(email){
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+    
 let otpVerified = false;
 
 function togglePass(){
@@ -134,6 +147,11 @@ function sendOTP(){
     btn.disabled = true;
     btn.innerText = "Sending OTP...";
 
+    if(!isValidEmail(email)){
+        alert("Enter valid email first");
+        return;
+    }
+    
     fetch("/send-otp", {
         method: "POST",
         headers: {
@@ -218,10 +236,15 @@ function signup(){
     let dob = document.getElementById("dob").value;
 
     if(!name || !username || !password || !email || !dob){
-        alert("Please fill all fields");
+        alert("Please fill all required fields *");
         return;
     }
-
+    
+    if(!isValidEmail(email)){
+        alert("Please enter a valid email");
+        return;
+    }
+    
     if(!isValidPassword(password)){
         alert("Password must have 6+ chars, number & letter");
         return;
