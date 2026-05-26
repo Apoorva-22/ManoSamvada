@@ -6,3 +6,4 @@ httpx
 certifi
 werkzeug
 psycopg2-binary
+requests
