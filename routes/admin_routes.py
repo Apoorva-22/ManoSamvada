@@ -58,7 +58,7 @@ def admin_data():
             FROM chat_log cl
             JOIN conversation_session cs 
                 ON cl.session_id = cs.session_id
-            LEFT JOIN user u 
+            LEFT JOIN users u 
                 ON cs.user_id = u.user_id
             WHERE u.username LIKE %s
             ORDER BY cl.timestamp DESC
@@ -77,7 +77,7 @@ def admin_data():
             FROM chat_log cl
             JOIN conversation_session cs 
                 ON cl.session_id = cs.session_id
-            LEFT JOIN user u 
+            LEFT JOIN users u 
                 ON cs.user_id = u.user_id
             ORDER BY cl.timestamp DESC
         """)
@@ -124,7 +124,7 @@ def export():
                ch.emotion_label, ch.is_crisis_flag, ch.timestamp
         FROM chat_log ch
         JOIN conversation_session cs ON ch.session_id = cs.session_id
-        JOIN user u ON cs.user_id = u.user_id
+        JOIN users u ON cs.user_id = u.user_id
     """)
 
     if cursor.with_rows:
