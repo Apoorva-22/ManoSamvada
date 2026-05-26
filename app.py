@@ -1,30 +1,27 @@
 import os
 from flask import Flask
 from dotenv import load_dotenv
+from psycopg2.extras import RealDictCursor
+
+from services.db_service import get_db
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-from routes.auth_routes import auth_bp
-from routes.chat_routes import chat_bp
-from routes.admin_routes import admin_bp
-from routes.analytics_routes import analytics_bp
-
-from services.db_service import get_db
-from psycopg2.extras import RealDictCursor
-
-
+# ---------------------------
+# DB INIT
+# ---------------------------
 def init_db():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    # one-time rebuild user table
-    cursor.execute('DROP TABLE IF EXISTS "users" CASCADE;')
+    # TEMP: one-time reset users table
+    cursor.execute("DROP TABLE IF EXISTS users CASCADE;")
 
     cursor.execute("""
-    CREATE TABLE "users" (
+    CREATE TABLE IF NOT EXISTS users (
         user_id SERIAL PRIMARY KEY,
         name VARCHAR(100),
         username VARCHAR(100) UNIQUE,
@@ -77,13 +74,25 @@ def init_db():
     db.close()
 
 
+# init once
 init_db()
+
+# ---------------------------
+# ROUTES
+# ---------------------------
+from routes.auth_routes import auth_bp
+from routes.chat_routes import chat_bp
+from routes.admin_routes import admin_bp
+from routes.analytics_routes import analytics_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(chat_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
 
+# ---------------------------
+# RUN
+# ---------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
 
