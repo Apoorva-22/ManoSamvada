@@ -22,7 +22,7 @@ def login():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("SELECT * FROM user WHERE username=%s", (data["username"],))
+    cursor.execute("SELECT * FROM users WHERE username=%s", (data["username"],))
     user = cursor.fetchone()
 
     cursor.close()
@@ -50,12 +50,12 @@ def signup():
     email = data["email"].lower().strip()
 
     # 🔍 Username check
-    cursor.execute("SELECT * FROM user WHERE LOWER(username)=%s", (username,))
+    cursor.execute("SELECT * FROM users WHERE LOWER(username)=%s", (username,))
     if cursor.fetchone():
         return jsonify({"success": False, "message": "Username already exists"})
 
     # 🔍 Email check
-    cursor.execute("SELECT * FROM user WHERE LOWER(email)=%s", (email,))
+    cursor.execute("SELECT * FROM users WHERE LOWER(email)=%s", (email,))
     if cursor.fetchone():
         return jsonify({"success": False, "message": "Email already exists"})
 
@@ -64,7 +64,7 @@ def signup():
 
     try:
         cursor.execute("""
-            INSERT INTO user (name, username, email, password_hash)
+            INSERT INTO users (name, username, email, password_hash)
             VALUES (%s, %s, %s, %s)
         """, (
             data["name"],
