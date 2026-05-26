@@ -13,7 +13,7 @@ def analytics():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    username = request.args.get("user")
+    username = request.args.get("users")
 
     # ✅ DEFAULT VALUES (IMPORTANT FIX)
     sessions = 0
@@ -25,7 +25,7 @@ def analytics():
     # 🔥 USER SPECIFIC
     if username:
 
-        cursor.execute("SELECT user_id FROM user WHERE username=%s", (username,))
+        cursor.execute("SELECT user_id FROM users WHERE username=%s", (username,))
         user = cursor.fetchone()
 
         if not user:
