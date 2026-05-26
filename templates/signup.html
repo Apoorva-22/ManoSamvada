@@ -140,17 +140,16 @@ function sendOTP(){
         alert("Enter email first");
         return;
     }
-
-    // already waiting
-    if(btn.disabled) return;
-
-    btn.disabled = true;
-    btn.innerText = "Sending OTP...";
-
+    
     if(!isValidEmail(email)){
         alert("Enter valid email first");
         return;
     }
+    
+    if(btn.disabled) return;
+    
+    btn.disabled = true;
+    btn.innerText = "Sending OTP...";
     
     fetch("/send-otp", {
         method: "POST",
@@ -237,6 +236,11 @@ function signup(){
 
     if(!name || !username || !password || !email || !dob){
         alert("Please fill all required fields *");
+        return;
+    }
+
+    if(!otpVerified){
+        alert("Please verify OTP first");
         return;
     }
     
