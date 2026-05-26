@@ -20,6 +20,7 @@ def init_db():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
+    # create tables first
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS "user" (
         user_id SERIAL PRIMARY KEY,
@@ -33,7 +34,7 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS conversation_session (
         session_id SERIAL PRIMARY KEY,
-        user_id INT,
+        user_id VARCHAR(100),
         topic TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -62,7 +63,8 @@ def init_db():
         password_hash TEXT
     );
     """)
-    cursor.execute('DROP TABLE IF EXISTS "user" CASCADE;')
+
+    # alter after create
     cursor.execute("""
     ALTER TABLE "user"
     ADD COLUMN IF NOT EXISTS name VARCHAR(100);
