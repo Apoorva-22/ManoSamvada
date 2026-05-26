@@ -116,20 +116,66 @@ function isValidPassword(password){
 
 // 🔥 Send OTP
 function sendOTP(){
-    let email = document.getElementById("email").value;
+
+    const btn = document.getElementById("sendOtpBtn");
+    const email = document.getElementById("email").value;
 
     if(!email){
         alert("Enter email first");
         return;
     }
 
+    // already waiting
+    if(btn.disabled) return;
+
+    btn.disabled = true;
+    btn.innerText = "Sending OTP...";
+
     fetch("/send-otp", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email})
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({ email })
     })
-    .then(res => res.json())
-    .then(data => alert(data.message));
+    .then(async res => {
+
+        const data = await res.json();
+
+        alert(data.message || "OTP sent to email");
+
+        // start 5 min countdown
+        let seconds = 300;
+
+        const timer = setInterval(() => {
+
+            seconds--;
+
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+
+            btn.innerText =
+                `Resend OTP in ${min}:${sec
+                    .toString()
+                    .padStart(2,"0")}`;
+
+            if(seconds <= 0){
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.innerText = "Send Email OTP";
+            }
+
+        }, 1000);
+
+    })
+    .catch(err => {
+        console.error(err);
+
+        alert("OTP send failed");
+
+        btn.disabled = false;
+        btn.innerText = "Send Email OTP";
+    });
 }
 
 // 🔥 Verify OTP
