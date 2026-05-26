@@ -11,8 +11,8 @@ EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 otp_store = {}
 
-# ---------- EMAIL OTP ----------
 def send_email_otp(email):
+
     otp = str(random.randint(1000, 9999))
 
     otp_store[email] = {
@@ -21,7 +21,8 @@ def send_email_otp(email):
     }
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+
         server.ehlo()
         server.starttls()
         server.ehlo()
@@ -31,12 +32,13 @@ def send_email_otp(email):
         server.sendmail(
             EMAIL_USER,
             email,
-            f"Your OTP is {otp}"
+            f"Subject: ManoSamvada OTP\n\nYour OTP is {otp}"
         )
 
         server.quit()
-        print("OTP:", otp)
+
+        print("OTP sent:", otp)
 
     except Exception as e:
         print("Email Error:", e)
-
+        raise e
