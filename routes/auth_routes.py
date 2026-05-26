@@ -141,26 +141,28 @@ def guest():
     session["user"] = "guest"
     return redirect("/chat-page")
 
-@auth_bp.route("/sessions")
+@chat_bp.route("/sessions")
 def get_sessions():
 
     if "user" not in session:
         return jsonify([])
 
-    db = get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
-
     user_id = session.get("user")
 
     if user_id == "guest":
-        return jsonify([])   # 🔥 guest ke liye empty
-    else:
-        cursor.execute("""
-            SELECT session_id, topic
-            FROM conversation_session
-            WHERE user_id = %s 
-            ORDER BY session_id DESC
-        """, (user_id,))
+        return jsonify([])
+
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT
+            session_id,
+            COALESCE(topic, 'Thinking...') AS topic
+        FROM conversation_session
+        WHERE user_id = %s
+        ORDER BY session_id DESC
+    """, (user_id,))
 
     sessions = cursor.fetchall()
 
@@ -168,7 +170,7 @@ def get_sessions():
     db.close()
 
     return jsonify(sessions)
-
+    
 @auth_bp.route("/logout")
 def logout():
     session.clear()
