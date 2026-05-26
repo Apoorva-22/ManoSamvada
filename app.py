@@ -19,6 +19,7 @@ def init_db():
 
     # TEMP: one-time reset users table
     cursor.execute("DROP TABLE IF EXISTS users CASCADE;")
+    cursor.execute("DROP TABLE IF EXISTS conversation_session CASCADE;")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
@@ -33,7 +34,7 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS conversation_session (
         session_id SERIAL PRIMARY KEY,
-        user_id VARCHAR(100),
+        user_id INT,
         topic TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
