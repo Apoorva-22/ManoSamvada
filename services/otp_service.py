@@ -21,18 +21,28 @@ def send_email_otp(email):
     }
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp-relay.brevo.com", 587)
 
         server.ehlo()
         server.starttls()
         server.ehlo()
 
-        server.login(EMAIL_USER, EMAIL_PASS)
+        server.login(
+            EMAIL_USER,
+            EMAIL_PASS
+        )
+
+        message = f"""Subject: ManoSamvada OTP
+
+Your OTP is {otp}
+
+Valid for 5 minutes.
+"""
 
         server.sendmail(
             EMAIL_USER,
             email,
-            f"Subject: ManoSamvada OTP\n\nYour OTP is {otp}"
+            message
         )
 
         server.quit()
