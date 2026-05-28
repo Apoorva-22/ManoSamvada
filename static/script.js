@@ -43,48 +43,39 @@ function addMessage(text, type){
     div.classList.add("bubble", type);
 
     let msgText = document.createElement("div");
-    msgText.classList.add("msg-text");
     msgText.innerText = text;
 
     div.appendChild(msgText);
 
-    // only user msgs
     if(type === "user"){
 
-        let actions = document.createElement("div");
-        actions.classList.add("msg-actions");
+        // copy on right click
+        div.addEventListener("contextmenu", function(e){
+            e.preventDefault();
+            navigator.clipboard.writeText(msgText.innerText);
+        });
 
-        // COPY
-        let copyBtn = document.createElement("button");
-        copyBtn.innerText = "📋";
+        // double click = edit same place
+        div.addEventListener("dblclick", function(){
 
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(text);
-        };
+            msgText.contentEditable = true;
+            msgText.focus();
 
-        // EDIT
-        let editBtn = document.createElement("button");
-        editBtn.innerText = "✏️";
+            // save when Enter
+            msgText.onkeydown = function(e){
 
-        editBtn.onclick = () => {
+                if(e.key === "Enter" && !e.shiftKey){
+                    e.preventDefault();
 
-            let input = document.getElementById("msg");
+                    msgText.contentEditable = false;
+                }
+            };
 
-            // remove emoji prefix if present
-            let clean = text.replace(/^🧑\s*/, "");
-
-            input.value = clean;
-
-            input.focus();
-
-            // optional remove bubble
-            div.remove();
-        };
-
-        actions.appendChild(copyBtn);
-        actions.appendChild(editBtn);
-
-        div.appendChild(actions);
+            // save when click outside
+            msgText.onblur = function(){
+                msgText.contentEditable = false;
+            };
+        });
     }
 
     chatBox.appendChild(div);
@@ -92,7 +83,6 @@ function addMessage(text, type){
     lastType = type;
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 
 // SAVE CHAT
 // function saveChat(text, type) {
