@@ -220,13 +220,18 @@ def get_sessions():
 
     cursor.execute("""
         SELECT
-            session_id,
-            COALESCE(topic, 'New Chat') AS topic
-        FROM conversation_session
-        WHERE user_id = %s
-        ORDER BY session_id DESC
+            cs.session_id,
+            COALESCE(cs.topic, 'New Chat') AS topic
+        FROM conversation_session cs
+        WHERE cs.user_id = %s
+        AND EXISTS (
+            SELECT 1
+            FROM chat_log cl
+            WHERE cl.session_id = cs.session_id
+        )
+        ORDER BY cs.session_id DESC
     """, (user_id,))
-
+    
     sessions = cursor.fetchall()
 
     cursor.close()
