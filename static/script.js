@@ -149,8 +149,8 @@ async function openProfile(){
 
     let joinedText = "Joined: Not available";
 
-    if (data.joined) {
-        let date = new Date(data.joined);
+    if (data.created_at) {
+        let date = new Date(data.created_at);
 
         let formatted = date.toLocaleString("en-IN", {
             day: "numeric",
@@ -207,8 +207,8 @@ async function loadUser(){
     document.querySelector(".avatar").innerText = initial;
 
     // 🔥 joining date (NEW)
-    if (data.joined) {
-        let date = new Date(data.joined);
+    if (data.created_at) {
+        let date = new Date(data.created_at);
         document.querySelector(".joined").innerText =
             "Joined: " + date.toLocaleDateString();
     }
