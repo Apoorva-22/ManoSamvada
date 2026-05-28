@@ -56,7 +56,7 @@ function addMessage(text, type){
 
         // COPY
         let copyBtn = document.createElement("button");
-        copyBtn.innerText = "📋";
+        copyBtn.innerText = "⧉";
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(msgText.innerText);
@@ -64,7 +64,7 @@ function addMessage(text, type){
 
         // EDIT
         let editBtn = document.createElement("button");
-        editBtn.innerText = "✏️";
+        editBtn.innerText = "🖊";
 
         editBtn.onclick = () => {
 
