@@ -36,6 +36,14 @@ function handleKey(e) {
     }
 }
 
+function handleLoginKey(e){
+
+    if(e.key === "Enter"){
+        e.preventDefault();
+        login();
+    }
+}
+
 function togglePassword(){
 
     const pass = document.getElementById("password");
