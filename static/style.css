@@ -651,3 +651,33 @@ body.modal-open .container {
     filter: blur(5px);
 }
 
+
+.msg-actions{
+    display:none;
+    gap:6px;
+    margin-top:6px;
+    justify-content:flex-end;
+}
+
+.bubble.user:hover .msg-actions{
+    display:flex;
+}
+
+.msg-actions button{
+    background:rgba(255,255,255,0.08);
+    border:none;
+    color:white;
+    border-radius:6px;
+    padding:4px 6px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.msg-actions button:hover{
+    background:rgba(255,255,255,0.15);
+}
+
+.msg-text[contenteditable="true"]{
+    outline:none;
+    border-bottom:1px solid rgba(255,255,255,0.25);
+}
