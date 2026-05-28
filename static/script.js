@@ -23,7 +23,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // ENTER KEY
 function handleKey(e) {
-    if (e.key === "Enter") sendMessage();
+
+    // Shift + Enter → next line
+    if (e.key === "Enter" && e.shiftKey) {
+        return;
+    }
+
+    // Enter only → send
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+    }
 }
 
 
@@ -31,7 +41,51 @@ function addMessage(text, type){
 
     let div = document.createElement("div");
     div.classList.add("bubble", type);
-    div.innerText = text;
+
+    let msgText = document.createElement("div");
+    msgText.classList.add("msg-text");
+    msgText.innerText = text;
+
+    div.appendChild(msgText);
+
+    // only user msgs
+    if(type === "user"){
+
+        let actions = document.createElement("div");
+        actions.classList.add("msg-actions");
+
+        // COPY
+        let copyBtn = document.createElement("button");
+        copyBtn.innerText = "📋";
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(text);
+        };
+
+        // EDIT
+        let editBtn = document.createElement("button");
+        editBtn.innerText = "✏️";
+
+        editBtn.onclick = () => {
+
+            let input = document.getElementById("msg");
+
+            // remove emoji prefix if present
+            let clean = text.replace(/^🧑\s*/, "");
+
+            input.value = clean;
+
+            input.focus();
+
+            // optional remove bubble
+            div.remove();
+        };
+
+        actions.appendChild(copyBtn);
+        actions.appendChild(editBtn);
+
+        div.appendChild(actions);
+    }
 
     chatBox.appendChild(div);
 
