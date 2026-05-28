@@ -68,19 +68,24 @@ function addMessage(text, type){
 
         editBtn.onclick = () => {
 
-            let input = document.getElementById("msg");
+            msgText.contentEditable = true;
+            msgText.focus();
+        
+            // save on Enter
+            msgText.onkeydown = function(e){
+        
+                if(e.key === "Enter" && !e.shiftKey){
+                    e.preventDefault();
+        
+                    msgText.contentEditable = false;
+                }
+            };
 
-            // remove emoji prefix if present
-            let clean = text.replace(/^🧑\s*/, "");
-
-            input.value = clean;
-
-            input.focus();
-
-            // optional remove bubble
-            div.remove();
-        };
-
+    // save on click outside
+    msgText.onblur = function(){
+        msgText.contentEditable = false;
+    };
+};
         actions.appendChild(copyBtn);
         actions.appendChild(editBtn);
 
