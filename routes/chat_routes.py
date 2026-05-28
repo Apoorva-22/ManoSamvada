@@ -193,7 +193,38 @@ def get_user():
     db.close()
 
     return jsonify(user or {})
-    
+
+@chat_bp.route("/sessions")
+def get_sessions():
+
+    if "user" not in session:
+        return jsonify([])
+
+    user_id = session.get("user")
+
+    if user_id == "guest":
+        return jsonify([])
+
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT
+            session_id,
+            COALESCE(topic, 'Thinking...') AS topic
+        FROM conversation_session
+        WHERE user_id = %s
+        ORDER BY session_id DESC
+    """, (user_id,))
+
+    sessions = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return jsonify(sessions)
+
+
 @chat_bp.route("/get-session/<int:session_id>")
 def get_session(session_id):
 
