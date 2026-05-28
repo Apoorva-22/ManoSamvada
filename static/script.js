@@ -43,39 +43,48 @@ function addMessage(text, type){
     div.classList.add("bubble", type);
 
     let msgText = document.createElement("div");
+    msgText.classList.add("msg-text");
     msgText.innerText = text;
 
     div.appendChild(msgText);
 
+    // only user msgs
     if(type === "user"){
 
-        // copy on right click
-        div.addEventListener("contextmenu", function(e){
-            e.preventDefault();
-            navigator.clipboard.writeText(msgText.innerText);
-        });
+        let actions = document.createElement("div");
+        actions.classList.add("msg-actions");
 
-        // double click = edit same place
-        div.addEventListener("dblclick", function(){
+        // COPY
+        let copyBtn = document.createElement("button");
+        copyBtn.innerText = "⿻";
 
-            msgText.contentEditable = true;
-            msgText.focus();
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(text);
+        };
 
-            // save when Enter
-            msgText.onkeydown = function(e){
+        // EDIT
+        let editBtn = document.createElement("button");
+        editBtn.innerText = "🖊";
 
-                if(e.key === "Enter" && !e.shiftKey){
-                    e.preventDefault();
+        editBtn.onclick = () => {
 
-                    msgText.contentEditable = false;
-                }
-            };
+            let input = document.getElementById("msg");
 
-            // save when click outside
-            msgText.onblur = function(){
-                msgText.contentEditable = false;
-            };
-        });
+            // remove emoji prefix if present
+            let clean = text.replace(/^🧑\s*/, "");
+
+            input.value = clean;
+
+            input.focus();
+
+            // optional remove bubble
+            div.remove();
+        };
+
+        actions.appendChild(copyBtn);
+        actions.appendChild(editBtn);
+
+        div.appendChild(actions);
     }
 
     chatBox.appendChild(div);
@@ -83,7 +92,6 @@ function addMessage(text, type){
     lastType = type;
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 // SAVE CHAT
 // function saveChat(text, type) {
 //     let chats = JSON.parse(localStorage.getItem("chatHistory")) || [];
