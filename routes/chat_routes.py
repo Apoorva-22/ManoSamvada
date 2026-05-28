@@ -259,33 +259,6 @@ def switch_session(session_id):
     return jsonify({"success": True})
 
 
-@chat_bp.route("/sessions")
-def get_sessions():
-
-    if "user" not in session:
-        return jsonify([])
-
-    db = get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
-
-    user_id = session.get("user")
-
-    if user_id == "guest":
-        return jsonify([])   # 🔥 guest ke liye empty
-    else:
-        cursor.execute("""
-            SELECT session_id, topic
-            FROM conversation_session
-            WHERE user_id = %s 
-            ORDER BY session_id DESC
-        """, (user_id,))
-
-    sessions = cursor.fetchall()
-
-    cursor.close()
-    db.close()
-
-    return jsonify(sessions)
 
 @chat_bp.route("/search-sessions", methods=["GET"])
 def search_sessions():
