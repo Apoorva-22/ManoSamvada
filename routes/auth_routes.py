@@ -7,10 +7,13 @@ from psycopg2.extras import RealDictCursor
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/")
 def welcome():
     return render_template("welcome.html")
 
+
+# 🔐 LOGIN
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -22,22 +25,35 @@ def login():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("SELECT * FROM users WHERE username=%s", (data["username"],))
+    cursor.execute(
+        "SELECT * FROM users WHERE username=%s",
+        (data["username"],)
+    )
+
     user = cursor.fetchone()
 
     cursor.close()
     db.close()
 
-    if user and check_password_hash(user["password_hash"], data["password"]):
+    if user and check_password_hash(
+        user["password_hash"],
+        data["password"]
+    ):
         session["user"] = user["user_id"]
-        return jsonify({"success": True})
 
-    return jsonify({"success": False})
+        return jsonify({
+            "success": True
+        })
+
+    return jsonify({
+        "success": False
+    })
 
 
 # 📝 SIGNUP
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
+
     if request.method == "GET":
         return render_template("signup.html")
 
@@ -49,23 +65,46 @@ def signup():
     username = data["username"].lower().strip()
     email = data["email"].lower().strip()
 
-    # 🔍 Username check
-    cursor.execute("SELECT * FROM users WHERE LOWER(username)=%s", (username,))
-    if cursor.fetchone():
-        return jsonify({"success": False, "message": "Username already exists"})
+    # username exists?
+    cursor.execute(
+        "SELECT * FROM users WHERE LOWER(username)=%s",
+        (username,)
+    )
 
-    # 🔍 Email check
-    cursor.execute("SELECT * FROM users WHERE LOWER(email)=%s", (email,))
     if cursor.fetchone():
-        return jsonify({"success": False, "message": "Email already exists"})
+        cursor.close()
+        db.close()
 
-    from werkzeug.security import generate_password_hash
+        return jsonify({
+            "success": False,
+            "message": "Username already exists"
+        })
+
+    # email exists?
+    cursor.execute(
+        "SELECT * FROM users WHERE LOWER(email)=%s",
+        (email,)
+    )
+
+    if cursor.fetchone():
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Email already exists"
+        })
+
     hashed_password = generate_password_hash(data["password"])
 
     try:
+
+        # 🔥 INSERT + RETURN user_id
         cursor.execute("""
-            INSERT INTO users (name, username, email, password_hash)
+            INSERT INTO users
+            (name, username, email, password_hash)
             VALUES (%s, %s, %s, %s)
+            RETURNING user_id
         """, (
             data["name"],
             username,
@@ -73,25 +112,36 @@ def signup():
             hashed_password
         ))
 
+        new_user = cursor.fetchone()
+
         db.commit()
 
-        # 🔥 IMPORTANT: session set
-        session["user"] = cursor.lastrowid
+        # 🔥 auto-login after signup
+        session["user"] = new_user["user_id"]
+
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "success": True
+        })
 
     except Exception as e:
-        print("ERROR:", e)
+
+        print("SIGNUP ERROR:", str(e))
+
         db.rollback()
+
+        cursor.close()
+        db.close()
+
         return jsonify({
             "success": False,
             "message": "Server error. Try again."
         })
 
-    cursor.close()
-    db.close()
 
-    return jsonify({"success": True})
-
-# 📩 OTP SEND
+# 📩 SEND OTP
 @auth_bp.route("/send-otp", methods=["POST"])
 def send_otp():
 
@@ -101,8 +151,6 @@ def send_otp():
 
     try:
         send_email_otp(email)
-
-        print("OTP mail sent successfully")
 
         return jsonify({
             "success": True,
@@ -118,31 +166,47 @@ def send_otp():
             "message": str(e)
         }), 500
 
-# ✅ OTP VERIFY
+
+# ✅ VERIFY OTP
 @auth_bp.route("/verify-otp", methods=["POST"])
 def verify_otp():
+
     data = request.json
+
     record = otp_store.get(data["email"])
 
     if not record:
         return jsonify({"success": False})
 
     if time.time() - record["time"] > 300:
-        return jsonify({"success": False, "message": "OTP expired"})
+        return jsonify({
+            "success": False,
+            "message": "OTP expired"
+        })
 
     if record["otp"] == data["otp"]:
-        return jsonify({"success": True})
+        return jsonify({
+            "success": True
+        })
 
-    return jsonify({"success": False})
+    return jsonify({
+        "success": False
+    })
 
 
+# 👤 GUEST
 @auth_bp.route("/guest")
 def guest():
+
     session["user"] = "guest"
+
     return redirect("/chat-page")
 
 
+# 🚪 LOGOUT
 @auth_bp.route("/logout")
 def logout():
+
     session.clear()
+
     return redirect("/")
