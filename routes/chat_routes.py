@@ -25,13 +25,17 @@ def start_session():
     if user_id == "guest":
         user_id = None 
 
-    cursor.execute(
-        "INSERT INTO conversation_session (user_id) VALUES (%s)",
-        (user_id,)
-    )
+    cursor.execute("""
+        INSERT INTO conversation_session (user_id)
+        VALUES (%s)
+        RETURNING session_id
+    """, (user_id,))
+    
+    new_session = cursor.fetchone()
+    
     db.commit()
-
-    session["chat_session"] = cursor.lastrowid
+    
+    session["chat_session"] = new_session["session_id"]
 
     cursor.close()
     db.close()
@@ -51,13 +55,17 @@ def chat():
 
     if not session.get("chat_session"):
 
-        cursor.execute(
-            "INSERT INTO conversation_session (user_id) VALUES (%s)",
-            (session.get("user"),)
-        )
+        cursor.execute("""
+            INSERT INTO conversation_session (user_id)
+            VALUES (%s)
+            RETURNING session_id
+        """, (session.get("user"),))
+    
+        new_session = cursor.fetchone()
+    
         db.commit()
-
-        session["chat_session"] = cursor.lastrowid
+    
+        session["chat_session"] = new_session["session_id"]
     msg = request.json["message"].strip()
 
     emotion = detect_emotion(msg)
@@ -113,35 +121,37 @@ def chat():
     if (not result) or (result and not result["topic"]):
 
         cursor.execute("""
-            SELECT message_text 
+            SELECT message_text
             FROM chat_log
             WHERE session_id=%s
             ORDER BY timestamp ASC
-            LIMIT 4
+            LIMIT 1
         """, (session["chat_session"],))
-
-        msgs = [row["message_text"] for row in cursor.fetchall()]
-
-        if len(msgs) >= 3:
-
-            combined = " ".join(msgs)
-
-            topic = generate_topic(combined)
-
-            # 🔥 FALLBACK (IMPORTANT)
+        
+        first_msg_row = cursor.fetchone()
+        
+        if first_msg_row:
+        
+            first_msg = first_msg_row["message_text"].strip()
+        
+            topic = generate_topic(first_msg)
+        
+            # fallback
             if not topic:
-                topic = msgs[0][:20]
-
+                topic = first_msg[:20]
+        
             print("Generated topic:", topic)
-
+        
             cursor.execute("""
                 UPDATE conversation_session
                 SET topic=%s
                 WHERE session_id=%s
-            """, (topic, session["chat_session"]))
-
+            """, (
+                topic,
+                session["chat_session"]
+            ))
+        
             db.commit()
-
     # topic fetch karke bhej
             cursor.execute("""
             SELECT topic FROM conversation_session
@@ -211,7 +221,7 @@ def get_sessions():
     cursor.execute("""
         SELECT
             session_id,
-            COALESCE(topic, 'Thinking...') AS topic
+            COALESCE(topic, 'New Chat') AS topic
         FROM conversation_session
         WHERE user_id = %s
         ORDER BY session_id DESC
