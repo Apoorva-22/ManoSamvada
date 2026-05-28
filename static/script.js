@@ -48,51 +48,42 @@ function addMessage(text, type){
 
     div.appendChild(msgText);
 
-    // only user msgs
+    // only for user messages
     if(type === "user"){
 
         let actions = document.createElement("div");
         actions.classList.add("msg-actions");
-    
+
         // COPY
         let copyBtn = document.createElement("button");
         copyBtn.innerText = "📋";
-    
+
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(msgText.innerText);
         };
-    
+
         // EDIT
         let editBtn = document.createElement("button");
         editBtn.innerText = "✏️";
-    
+
         editBtn.onclick = () => {
-    
+
             msgText.contentEditable = true;
             msgText.focus();
-    
+
             msgText.onkeydown = function(e){
+
                 if(e.key === "Enter" && !e.shiftKey){
                     e.preventDefault();
                     msgText.contentEditable = false;
                 }
             };
-    
+
             msgText.onblur = function(){
                 msgText.contentEditable = false;
             };
         };
 
-    actions.appendChild(copyBtn);
-    actions.appendChild(editBtn);
-
-    div.appendChild(actions);
-}
-    // save on click outside
-    msgText.onblur = function(){
-        msgText.contentEditable = false;
-    };
-};
         actions.appendChild(copyBtn);
         actions.appendChild(editBtn);
 
@@ -104,6 +95,7 @@ function addMessage(text, type){
     lastType = type;
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 // SAVE CHAT
 // function saveChat(text, type) {
 //     let chats = JSON.parse(localStorage.getItem("chatHistory")) || [];
