@@ -53,34 +53,41 @@ function addMessage(text, type){
 
         let actions = document.createElement("div");
         actions.classList.add("msg-actions");
-
+    
         // COPY
         let copyBtn = document.createElement("button");
-        copyBtn.innerText = "⿻";
-
+        copyBtn.innerText = "📋";
+    
         copyBtn.onclick = () => {
-            navigator.clipboard.writeText(text);
+            navigator.clipboard.writeText(msgText.innerText);
         };
-
+    
         // EDIT
         let editBtn = document.createElement("button");
-        editBtn.innerText = "🖊";
-
+        editBtn.innerText = "✏️";
+    
         editBtn.onclick = () => {
-
+    
             msgText.contentEditable = true;
             msgText.focus();
-        
-            // save on Enter
+    
             msgText.onkeydown = function(e){
-        
                 if(e.key === "Enter" && !e.shiftKey){
                     e.preventDefault();
-        
                     msgText.contentEditable = false;
                 }
             };
+    
+            msgText.onblur = function(){
+                msgText.contentEditable = false;
+            };
+        };
 
+    actions.appendChild(copyBtn);
+    actions.appendChild(editBtn);
+
+    div.appendChild(actions);
+}
     // save on click outside
     msgText.onblur = function(){
         msgText.contentEditable = false;
