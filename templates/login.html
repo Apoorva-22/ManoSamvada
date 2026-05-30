@@ -71,7 +71,12 @@ button:hover {
 <div class="box">
     <h2>Login</h2>
 
-    <input type="text" id="username" placeholder="Username">
+    <input
+        type="text"
+        id="username"
+        placeholder="Username"
+        onkeydown="handleLoginKey(event)"
+    >
     <div class="password-wrap">
         <input
             type="password"
