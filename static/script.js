@@ -367,8 +367,6 @@ async function sendMessage() {
 
 async function resendEditedMessage(text){
 
-    showTyping();
-
     const r = await fetch("/chat", {
         method:"POST",
         headers:{
@@ -378,8 +376,6 @@ async function resendEditedMessage(text){
             message:text
         })
     });
-
-    hideTyping();
 
     const data = await r.json();
 
