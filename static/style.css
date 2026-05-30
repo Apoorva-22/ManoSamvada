@@ -697,3 +697,13 @@ body.modal-open .container {
     outline:none;
     border-bottom:1px solid rgba(255,255,255,0.25);
 }
+
+.msg-wrap{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+}
+
+.user-icon{
+    flex-shrink:0;
+}
