@@ -60,40 +60,69 @@ function addMessage(text, type){
     let div = document.createElement("div");
     div.classList.add("bubble", type);
 
+    // wrapper
+    let msgWrap = document.createElement("div");
+    msgWrap.classList.add("msg-wrap");
+
+    // keep user icon static
+    if(type === "user"){
+        let icon = document.createElement("span");
+        icon.classList.add("user-icon");
+        icon.innerText = "🧑";
+        msgWrap.appendChild(icon);
+    }
+
     let msgText = document.createElement("div");
     msgText.classList.add("msg-text");
     msgText.innerText = text;
 
-    div.appendChild(msgText);
+    msgWrap.appendChild(msgText);
+    div.appendChild(msgWrap);
 
-    // only for user messages
+    // actions
     if(type === "user"){
 
         let actions = document.createElement("div");
         actions.classList.add("msg-actions");
 
-        // COPY
+        // copy
         let copyBtn = document.createElement("button");
-        copyBtn.innerText = "⧉";
+        copyBtn.innerText = "📋";
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(msgText.innerText);
         };
 
-        // EDIT
+        // edit
         let editBtn = document.createElement("button");
-        editBtn.innerText = "🖊";
+        editBtn.innerText = "✏️";
 
         editBtn.onclick = () => {
 
             msgText.contentEditable = true;
             msgText.focus();
 
-            msgText.onkeydown = function(e){
+            msgText.onkeydown = async function(e){
 
                 if(e.key === "Enter" && !e.shiftKey){
+
                     e.preventDefault();
+
                     msgText.contentEditable = false;
+
+                    let edited = msgText.innerText.trim();
+
+                    // remove everything below this bubble
+                    let next = div.nextSibling;
+
+                    while(next){
+                        let temp = next.nextSibling;
+                        next.remove();
+                        next = temp;
+                    }
+
+                    // send edited msg again
+                    await resendEditedMessage(edited);
                 }
             };
 
@@ -334,6 +363,29 @@ async function sendMessage() {
         addMessage("⚠️ Server error", "bot");
     }
 
+}
+
+async function resendEditedMessage(text){
+
+    showTyping();
+
+    const r = await fetch("/chat", {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            message:text
+        })
+    });
+
+    hideTyping();
+
+    const data = await r.json();
+
+    addMessage(data.reply, "bot");
+
+    loadSessions();
 }
 
 // ================= UI ENHANCEMENTS (SAFE ADDITIONS ONLY) =================
