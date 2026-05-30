@@ -68,7 +68,7 @@ function addMessage(text, type){
     if(type === "user"){
         let icon = document.createElement("span");
         icon.classList.add("user-icon");
-        //icon.innerText = "";
+        icon.innerText = "🧑";
         msgWrap.appendChild(icon);
     }
 
