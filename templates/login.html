@@ -117,6 +117,25 @@ history.pushState(null, null, location.href);
 window.onpopstate = function () {
     window.location.href = "/";
 };
+
+function togglePassword(){
+
+    const pass = document.getElementById("password");
+
+    if(pass.type === "password"){
+        pass.type = "text";
+    }else{
+        pass.type = "password";
+    }
+}
+
+function handleLoginKey(e){
+
+    if(e.key === "Enter"){
+        e.preventDefault();
+        login();
+    }
+}
 </script>
 </body>
 </html>
