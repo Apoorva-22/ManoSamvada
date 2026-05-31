@@ -118,10 +118,74 @@ def user_analytics_data():
         if "user" not in session:
             return jsonify({"error": "Unauthorized"})
 
-        user_id = session["user"]
-
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
+
+        # ================= GUEST MODE =================
+        if session["user"] == "guest":
+
+            session_id = session.get("chat_session")
+
+            if not session_id:
+                return jsonify({
+                    "sessions": 0,
+                    "chats": 0,
+                    "emotions": [],
+                    "crisis": 0,
+                    "daily": []
+                })
+
+            # chats
+            cursor.execute("""
+                SELECT COUNT(*) as total
+                FROM chat_log
+                WHERE session_id=%s
+            """, (session_id,))
+            chats = cursor.fetchone()["total"]
+
+            # emotions
+            cursor.execute("""
+                SELECT emotion_label, COUNT(*) as count
+                FROM chat_log
+                WHERE session_id=%s
+                GROUP BY emotion_label
+            """, (session_id,))
+            emotions = cursor.fetchall()
+
+            # crisis
+            cursor.execute("""
+                SELECT COUNT(*) as total
+                FROM chat_log
+                WHERE session_id=%s
+                AND is_crisis_flag = TRUE
+            """, (session_id,))
+            crisis = cursor.fetchone()["total"]
+
+            # daily
+            cursor.execute("""
+                SELECT
+                    TO_CHAR(DATE(timestamp), 'YYYY-MM-DD') as date,
+                    COUNT(*) as count
+                FROM chat_log
+                WHERE session_id=%s
+                GROUP BY DATE(timestamp)
+                ORDER BY DATE(timestamp)
+            """, (session_id,))
+            daily = cursor.fetchall()
+
+            cursor.close()
+            db.close()
+
+            return jsonify({
+                "sessions": 1,
+                "chats": chats,
+                "emotions": emotions,
+                "crisis": crisis,
+                "daily": daily
+            })
+
+        # ================= LOGGED-IN USER =================
+        user_id = session["user"]
 
         # sessions
         cursor.execute("""
