@@ -709,46 +709,59 @@ body.modal-open .container {
     flex-shrink:0;
 }
 
+.box input{
+    width:90%;
+    padding:10px;
+    margin:10px auto;
+
+    border-radius:6px;
+    border:none;
+    outline:none;
+
+    display:block;
+}
+
 .password-wrap{
-    position: relative;
-    width: 90%;
-    margin: 10px auto;
+    position:relative;
+    width:90%;
+    margin:10px auto;
 }
 
 .password-wrap input{
-    width: 100%;
-    padding: 10px 36px 10px 10px;
+    width:100%;
+    margin:0;
 
-    border-radius: 6px;
-    border: none;
-    outline: none;
+    padding:10px 38px 10px 10px;
 
-    margin: 0;
+    border-radius:6px;
+    border:none;
+    outline:none;
+
+    display:block;
 }
 
 .eye-btn{
-    position: absolute;
+    position:absolute;
 
-    right: 12px;
-    top: 50%;
+    right:10px;
+    top:50%;
 
-    transform: translateY(-50%);
+    transform:translateY(-50%);
 
-    cursor: pointer;
-    font-size: 16px;
+    cursor:pointer;
 
-    opacity: 0.75;
-    user-select: none;
+    font-size:14px;
+    line-height:1;
+
+    opacity:.75;
+    user-select:none;
 }
 
 .eye-btn:hover{
-    opacity: 1;
+    opacity:1;
 }
 
-input{
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: none;
+button{
+    width:90%;
+    margin-top:10px;
 }
