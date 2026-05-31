@@ -14,7 +14,6 @@ def admin_setup():
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        # username check
         cursor.execute(
             "SELECT * FROM admin WHERE username=%s",
             ("admin",)
@@ -29,12 +28,10 @@ def admin_setup():
             cursor.execute("""
                 UPDATE admin
                 SET
-                    email=%s,
                     password_hash=%s,
                     role=%s
                 WHERE username=%s
             """, (
-                "apoorva6627@gmail.com",
                 hashed,
                 "admin",
                 "admin"
@@ -44,11 +41,10 @@ def admin_setup():
 
             cursor.execute("""
                 INSERT INTO admin
-                (username,email,password_hash,role)
-                VALUES (%s,%s,%s,%s)
+                (username, password_hash, role)
+                VALUES (%s, %s, %s)
             """, (
                 "admin",
-                "apoorva6627@gmail.com",
                 hashed,
                 "admin"
             ))
@@ -63,7 +59,6 @@ def admin_setup():
     except Exception as e:
 
         return f"ERROR: {str(e)}"
-
     
 @admin_bp.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
