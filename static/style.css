@@ -704,6 +704,42 @@ body.modal-open .container {
     align-items:flex-start;
 }
 
+
 .user-icon{
     flex-shrink:0;
+}
+
+.password-wrap{
+    position:relative;
+    width:90%;
+    margin:10px auto;
+}
+
+
+.password-wrap input{
+    width:100%;
+    padding:10px 36px 10px 10px;
+
+    border-radius:6px;
+    border:none;
+    outline:none;
+}
+
+.eye-btn{
+    position:absolute;
+
+    right:10px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    opacity:0.7;
+}
+
+.eye-btn:hover{
+    opacity:1;
 }
