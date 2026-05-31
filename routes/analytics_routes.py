@@ -110,71 +110,157 @@ def user_analytics_page():
     return render_template("user_analytics.html")
 
 
+# @analytics_bp.route("/user/analytics-data")
+# def user_analytics_data():
+
+#     if "user" not in session:
+#         return jsonify({"error": "Unauthorized"})
+
+#     user_id = session["user"]
+
+#     db = get_db()
+#     cursor = db.cursor(cursor_factory=RealDictCursor)
+    
+#     # 🔹 Total Sessions
+#     cursor.execute("""
+#         SELECT COUNT(*) as total
+#         FROM conversation_session
+#         WHERE user_id=%s
+#     """, (user_id,))
+#     sessions = cursor.fetchone()["total"]
+
+#     # 🔹 Total Messages
+#     cursor.execute("""
+#         SELECT COUNT(*) as total
+#         FROM chat_log cl
+#         JOIN conversation_session cs ON cl.session_id = cs.session_id
+#         WHERE cs.user_id=%s
+#     """, (user_id,))
+#     chats = cursor.fetchone()["total"]
+
+#     # 🔹 Emotion Distribution
+#     cursor.execute("""
+#         SELECT emotion_label, COUNT(*) as count
+#         FROM chat_log cl
+#         JOIN conversation_session cs ON cl.session_id = cs.session_id
+#         WHERE cs.user_id=%s
+#         GROUP BY emotion_label
+#     """, (user_id,))
+#     emotions = cursor.fetchall()
+
+#     # 🔹 Crisis Count
+#     cursor.execute("""
+#         SELECT COUNT(*) as total
+#         FROM chat_log cl
+#         JOIN conversation_session cs ON cl.session_id = cs.session_id
+#         WHERE cs.user_id=%s AND cl.is_crisis_flag=1
+#     """, (user_id,))
+#     crisis = cursor.fetchone()["total"]
+
+#     # 🔹 Daily Trend
+#     cursor.execute("""
+#         SELECT DATE(cl.timestamp) as date, COUNT(*) as count
+#         FROM chat_log cl
+#         JOIN conversation_session cs ON cl.session_id = cs.session_id
+#         WHERE cs.user_id=%s
+#         GROUP BY DATE(cl.timestamp)
+#         ORDER BY date
+#     """, (user_id,))
+#     daily = cursor.fetchall()
+
+#     cursor.close()
+#     db.close()
+
+#     return jsonify({
+#         "sessions": sessions,
+#         "chats": chats,
+#         "emotions": emotions,
+#         "crisis": crisis,
+#         "daily": daily
+#     })
+
 @analytics_bp.route("/user/analytics-data")
 def user_analytics_data():
 
-    if "user" not in session:
-        return jsonify({"error": "Unauthorized"})
+    try:
 
-    user_id = session["user"]
+        if "user" not in session:
+            return jsonify({"error": "Unauthorized"})
 
-    db = get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
-    
-    # 🔹 Total Sessions
-    cursor.execute("""
-        SELECT COUNT(*) as total
-        FROM conversation_session
-        WHERE user_id=%s
-    """, (user_id,))
-    sessions = cursor.fetchone()["total"]
+        user_id = session["user"]
 
-    # 🔹 Total Messages
-    cursor.execute("""
-        SELECT COUNT(*) as total
-        FROM chat_log cl
-        JOIN conversation_session cs ON cl.session_id = cs.session_id
-        WHERE cs.user_id=%s
-    """, (user_id,))
-    chats = cursor.fetchone()["total"]
+        db = get_db()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    # 🔹 Emotion Distribution
-    cursor.execute("""
-        SELECT emotion_label, COUNT(*) as count
-        FROM chat_log cl
-        JOIN conversation_session cs ON cl.session_id = cs.session_id
-        WHERE cs.user_id=%s
-        GROUP BY emotion_label
-    """, (user_id,))
-    emotions = cursor.fetchall()
+        # sessions
+        cursor.execute("""
+            SELECT COUNT(*) as total
+            FROM conversation_session
+            WHERE user_id=%s
+        """, (user_id,))
+        sessions = cursor.fetchone()["total"]
 
-    # 🔹 Crisis Count
-    cursor.execute("""
-        SELECT COUNT(*) as total
-        FROM chat_log cl
-        JOIN conversation_session cs ON cl.session_id = cs.session_id
-        WHERE cs.user_id=%s AND cl.is_crisis_flag=1
-    """, (user_id,))
-    crisis = cursor.fetchone()["total"]
+        # chats
+        cursor.execute("""
+            SELECT COUNT(*) as total
+            FROM chat_log cl
+            JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+        """, (user_id,))
+        chats = cursor.fetchone()["total"]
 
-    # 🔹 Daily Trend
-    cursor.execute("""
-        SELECT DATE(cl.timestamp) as date, COUNT(*) as count
-        FROM chat_log cl
-        JOIN conversation_session cs ON cl.session_id = cs.session_id
-        WHERE cs.user_id=%s
-        GROUP BY DATE(cl.timestamp)
-        ORDER BY date
-    """, (user_id,))
-    daily = cursor.fetchall()
+        # emotions
+        cursor.execute("""
+            SELECT emotion_label, COUNT(*) as count
+            FROM chat_log cl
+            JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+            GROUP BY emotion_label
+        """, (user_id,))
+        emotions = cursor.fetchall()
 
-    cursor.close()
-    db.close()
+        # crisis
+        cursor.execute("""
+            SELECT COUNT(*) as total
+            FROM chat_log cl
+            JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+            AND cl.is_crisis_flag = TRUE
+        """, (user_id,))
+        crisis = cursor.fetchone()["total"]
 
-    return jsonify({
-        "sessions": sessions,
-        "chats": chats,
-        "emotions": emotions,
-        "crisis": crisis,
-        "daily": daily
-    })
+        # daily
+        cursor.execute("""
+            SELECT
+                TO_CHAR(DATE(cl.timestamp), 'YYYY-MM-DD') as date,
+                COUNT(*) as count
+            FROM chat_log cl
+            JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+            WHERE cs.user_id=%s
+            GROUP BY DATE(cl.timestamp)
+            ORDER BY DATE(cl.timestamp)
+        """, (user_id,))
+        daily = cursor.fetchall()
+
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "sessions": sessions,
+            "chats": chats,
+            "emotions": emotions,
+            "crisis": crisis,
+            "daily": daily
+        })
+
+    except Exception as e:
+
+        print("ANALYTICS ERROR:", str(e))
+
+        return jsonify({
+            "error": str(e)
+        }), 500
