@@ -4,36 +4,127 @@
 
 <h2>Admin Login</h2>
 
-<input id="user" placeholder="Username"><br><br>
-<input id="pass" type="password" placeholder="Password"><br><br>
+<input
+    id="user"
+    placeholder="Username"
+    onkeydown="handleKey(event)"
+>
 
-<button onclick="login()">Login</button>
+<br><br>
+
+<div style="
+    position:relative;
+    width:220px;
+    margin:auto;
+">
+
+    <input
+        id="pass"
+        type="password"
+        placeholder="Password"
+        onkeydown="handleKey(event)"
+        style="
+            width:100%;
+            padding-right:55px;
+            box-sizing:border-box;
+        "
+    >
+
+    <span
+        onclick="togglePassword()"
+        style="
+            position:absolute;
+            right:10px;
+            top:50%;
+            transform:translateY(-50%);
+            cursor:pointer;
+            color:black;
+            font-size:12px;
+            font-weight:bold;
+        "
+        id="togglePass"
+    >
+        Show
+    </span>
+
+</div>
+
+<br><br>
+
+<button onclick="login()">
+    Login
+</button>
 
 <script>
 function login(){
+
     fetch("/admin/login", {
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{
+            "Content-Type":"application/json"
+        },
         body: JSON.stringify({
-            username: document.getElementById("user").value,
-            password: document.getElementById("pass").value
+            username:
+                document.getElementById("user").value,
+
+            password:
+                document.getElementById("pass").value
         })
     })
     .then(res=>res.json())
     .then(data=>{
+
         if(data.success){
+
             window.location.href="/admin";
+
         } else {
-            alert("Invalid credentials");
+
+            alert(
+                data.message ||
+                "Invalid credentials"
+            );
         }
     });
 }
+
+function togglePassword(){
+
+    const pass =
+        document.getElementById("pass");
+
+    const btn =
+        document.getElementById("togglePass");
+
+    if(pass.type==="password"){
+
+        pass.type="text";
+        btn.innerText="Hide";
+
+    }else{
+
+        pass.type="password";
+        btn.innerText="Show";
+    }
+}
+
+function handleKey(e){
+
+    if(e.key==="Enter"){
+
+        e.preventDefault();
+        login();
+    }
+}
 </script>
+
 <script>
 history.pushState(null, null, location.href);
+
 window.onpopstate = function () {
     window.location.href = "/";
 };
 </script>
+
 </body>
 </html>
