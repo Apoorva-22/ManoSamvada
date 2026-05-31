@@ -6,6 +6,25 @@ from werkzeug.security import generate_password_hash
 
 admin_bp = Blueprint("admin", __name__)
 
+@admin_bp.route("/admin/check-table")
+def check_admin_table():
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name='admin'
+        ORDER BY ordinal_position
+    """)
+
+    cols = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return "<br>".join([c[0] for c in cols])
 @admin_bp.route("/admin/setup")
 def admin_setup():
 
