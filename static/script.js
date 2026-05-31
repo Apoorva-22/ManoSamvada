@@ -325,7 +325,7 @@ async function sendMessage() {
 
     if (!msg) return;
 
-    addMessage("🧑 " + msg, "user");
+    addMessage(msg, "user");
 
     input.value = "";
 
