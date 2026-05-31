@@ -22,14 +22,23 @@ body {
     text-align: center;
 }
 
-    .password-wrap{
+.password-wrap{
     position:relative;
-    width:100%;
+    width:90%;
+    margin:10px auto;
 }
 
 .password-wrap input{
     width:100%;
-    padding-right:45px;
+    margin:0;
+
+    padding:10px 38px 10px 10px;
+
+    border-radius:6px;
+    border:none;
+    outline:none;
+
+    display:block;
 }
 
 .eye-btn{
@@ -85,7 +94,7 @@ button:hover {
             onkeydown="handleLoginKey(event)"
         >
     
-        <span class="eye-btn" onclick="togglePassword()">👁️</span>
+        <span class="eye-btn" onclick="togglePassword()">👁</span>
     </div>
 
     <button onclick="login()">Login</button>
