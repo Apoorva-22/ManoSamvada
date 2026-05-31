@@ -623,8 +623,8 @@ function loadSession(sessionId){
         lastType = "";
 
         data.forEach(chat => {
-            addMessage("🧑 " + chat.message_text, "user");
-            addMessage("🤖 " + chat.bot_response, "bot");
+            addMessage(chat.message_text, "user");
+            addMessage(chat.bot_response, "bot");
         });
     });
 }
