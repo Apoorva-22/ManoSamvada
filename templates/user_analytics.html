@@ -49,6 +49,7 @@
     <p id="crisis"></p>
 </div>
 
+<div class="card" id="supportCard"></div>
 <div class="charts">
 
     <div class="card">
@@ -94,6 +95,80 @@ fetch("/user/analytics-data")
 
     dominantEl.innerText = "🔥 Dominant Emotion: " + dominant;
 
+    let supportCard = document.getElementById("supportCard");
+
+    if(dominant === "happy"){
+    
+        supportCard.className = "card support-good";
+    
+        supportCard.innerHTML = `
+            <h3>💙 You're doing really well</h3>
+    
+            <p>
+                We’re proud of the emotional progress you’ve made.
+                Keep checking in with yourself and take care.
+            </p>
+        `;
+    }
+    
+    else if(dominant === "sad" || dominant === "neutral"){
+    
+        supportCard.className = "card support-help";
+    
+        supportCard.innerHTML = `
+            <h3>🤝 Need someone to talk to?</h3>
+    
+            <p>
+                Tele-MANAS: 14416
+                <br>
+                AASRA: +91 22 2754 6669
+            </p>
+    
+            <p>
+                Talking to a therapist can help when things feel heavy.
+            </p>
+        `;
+    }
+    
+    else if(dominant === "angry"){
+    
+        supportCard.className = "card support-help";
+    
+        supportCard.innerHTML = `
+            <h3>🌿 Support is available</h3>
+    
+            <p>
+                Tele-MANAS: 14416
+                <br>
+                AASRA: +91 22 2754 6669
+            </p>
+    
+            <p>
+                It may help to talk through intense emotions with a professional.
+            </p>
+        `;
+    }
+    
+    if(data.crisis > 0){
+    
+        supportCard.className = "card support-alert";
+    
+        supportCard.innerHTML = `
+            <h3>🚨 Please reach out now</h3>
+    
+            <p>
+                Tele-MANAS: 14416
+                <br>
+                AASRA: +91 22 2754 6669
+            </p>
+    
+            <p>
+                If someone you trust is available,
+                please contact them right now.
+            </p>
+        `;
+    }
+    
     // 🎨 COLOR
     if(dominant === "angry"){
         dominantEl.style.color = "#ff4d4d";
