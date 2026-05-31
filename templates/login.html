@@ -21,55 +21,64 @@ body {
     width: 300px;
     text-align: center;
 }
+input,
+button,
+.password-wrap{
+    width:90%;
+    margin:10px auto;
+    display:block;
+}
+
+input{
+    padding:10px;
+    border-radius:6px;
+    border:none;
+    outline:none;
+
+    box-sizing:border-box;
+}
 
 .password-wrap{
     position:relative;
-    width:90%;
-    margin:10px auto;
 }
 
 .password-wrap input{
     width:100%;
     margin:0;
 
-    padding:10px 34px 10px 10px;
+    padding:10px 38px 10px 10px;
 
     border-radius:6px;
     border:none;
     outline:none;
-
-    display:block;
 
     box-sizing:border-box;
 }
 
 .eye-btn{
     position:absolute;
-    right:10px;
+
+    right:12px;
     top:50%;
+
     transform:translateY(-50%);
+
     cursor:pointer;
+
     font-size:15px;
-    user-select:none;
-    color: black;
-}
-    
-input {
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: none;
+    color:black;
 }
 
-button {
-    width: 90%;
-    padding: 10px;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+button{
+    padding:10px;
+
+    background:#4CAF50;
+    color:white;
+
+    border:none;
+    border-radius:6px;
+
+    cursor:pointer;
 }
 
 button:hover {
