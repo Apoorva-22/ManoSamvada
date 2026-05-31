@@ -2,9 +2,32 @@ from flask import Blueprint, request, jsonify, session, redirect, render_templat
 from services.db_service import get_db
 from werkzeug.security import check_password_hash
 from psycopg2.extras import RealDictCursor
+from werkzeug.security import generate_password_hash
 
 admin_bp = Blueprint("admin", __name__)
 
+
+@admin_bp.route("/admin/reset-temp")
+def reset_temp():
+
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
+    new_hash = generate_password_hash("Admin@123")
+
+    cursor.execute("""
+        UPDATE admin
+        SET password_hash=%s
+        WHERE username='admin'
+    """, (new_hash,))
+
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    return "Admin password reset done"
+    
 @admin_bp.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 
