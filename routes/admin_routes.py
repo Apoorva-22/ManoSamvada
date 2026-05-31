@@ -22,8 +22,7 @@ def admin_setup():
 
         existing = cursor.fetchone()
 
-        hashed =
-            generate_password_hash("Admin@123")
+        hashed = generate_password_hash("Admin@123")
 
         if existing:
 
