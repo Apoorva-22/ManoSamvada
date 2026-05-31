@@ -133,60 +133,83 @@ fetch("/user/analytics-data")
         `;
     }
     
-    else if(dominant === "sad" || dominant === "neutral"){
-    
+   else if(dominant === "sad"){
+
         supportCard.className = "card support-help";
     
         supportCard.innerHTML = `
-            <h3>🤝 Need someone to talk to?</h3>
+            <h3>💛 It’s okay to feel low sometimes</h3>
     
             <p>
-                Tele-MANAS: 14416
-                <br>
-                AASRA: +91 22 2754 6669
+                Everyone has difficult days.
+                You don’t have to carry everything alone.
             </p>
     
             <p>
-                Talking to a therapist can help when things feel heavy.
+                Talking to a close friend, family member,
+                or taking a little time for yourself can really help.
             </p>
         `;
     }
+
+    else if(dominant === "neutral"){
+
+        supportCard.className = "card support-good";
     
+        supportCard.innerHTML = `
+            <h3>🌱 You're checking in with yourself</h3>
+    
+            <p>
+                Right now things seem fairly balanced.
+                That’s a good sign.
+    
+                Keep noticing how you feel and take care of yourself.
+            </p>
+        `;
+    }
+
+
     else if(dominant === "angry"){
-    
+
         supportCard.className = "card support-help";
     
         supportCard.innerHTML = `
-            <h3>🌿 Support is available</h3>
+            <h3>🔥 It seems things have felt intense lately</h3>
     
             <p>
-                Tele-MANAS: 14416
-                <br>
-                AASRA: +91 22 2754 6669
+                Feeling angry or frustrated happens to everyone.
+                It’s okay to pause and give yourself a moment.
             </p>
     
             <p>
-                It may help to talk through intense emotions with a professional.
+                A short walk, deep breathing,
+                or talking with someone you trust
+                can really help release some of that tension.
             </p>
         `;
     }
     
     if(data.crisis > 0){
-    
+
         supportCard.className = "card support-alert";
     
         supportCard.innerHTML = `
-            <h3>🚨 Please reach out now</h3>
+            <h3>🫂 You may be carrying a lot right now</h3>
+    
+            <p>
+                If things feel overwhelming,
+                please don’t go through it alone.
+            </p>
+    
+            <p>
+                Talking to someone you trust
+                can make a real difference.
+            </p>
     
             <p>
                 Tele-MANAS: 14416
                 <br>
                 AASRA: +91 22 2754 6669
-            </p>
-    
-            <p>
-                If someone you trust is available,
-                please contact them right now.
             </p>
         `;
     }
