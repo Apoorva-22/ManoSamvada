@@ -41,9 +41,8 @@ def reset_temp():
 def admin_login():
 
     if request.method == "GET":
-        return render_template("admin_login.html")  # 🔥 page show
+        return render_template("admin_login.html")
 
-    # POST logic
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
@@ -53,29 +52,43 @@ def admin_login():
         "SELECT * FROM admin WHERE username=%s",
         (data["username"].strip(),)
     )
-    
+
     admin = cursor.fetchone()
-    
-    print("USERNAME:", data["username"])
-    print("ADMIN FOUND:", admin)
-    
-    if admin:
-        print(
-            "PASSWORD MATCH:",
-            check_password_hash(
-                admin["password_hash"],
-                data["password"]
-            )
-        )
-    
-    if admin and check_password_hash(
+
+    if not admin:
+
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Admin not found"
+        })
+
+    ok = check_password_hash(
         admin["password_hash"],
         data["password"]
-    ):
-        session["admin"] = admin["admin_id"]
-        return jsonify({"success": True})
+    )
+
+    if not ok:
+
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Password mismatch"
+        })
+
+    session["admin"] = admin["admin_id"]
+
+    cursor.close()
+    db.close()
+
+    return jsonify({
+        "success": True
+    })
     
-    return jsonify({"success": False})
 # 🔒 ADMIN PAGE
 @admin_bp.route("/admin")
 def admin():
