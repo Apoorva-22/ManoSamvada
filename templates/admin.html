@@ -54,9 +54,12 @@ input{
     top:50%;
     transform:translateY(-50%);
     cursor:pointer;
-    font-size:14px;
+
+    font-size:12px;
+    font-weight:600;
+
+    color:#555;
     user-select:none;
-    color:black;
 }
 
 button{
@@ -97,12 +100,15 @@ button:hover{
             placeholder="Password"
             onkeydown="handleKey(event)"
         >
-
+    
         <span
             class="eye-btn"
             onclick="togglePassword()"
-        >👁</span>
-
+            id="togglePass"
+        >
+            Show
+        </span>
+    
     </div>
 
     <button onclick="login()">
@@ -149,10 +155,18 @@ function togglePassword(){
     const pass =
         document.getElementById("password");
 
+    const btn =
+        document.getElementById("togglePass");
+
     if(pass.type==="password"){
+
         pass.type="text";
+        btn.innerText="Hide";
+
     }else{
+
         pass.type="password";
+        btn.innerText="Show";
     }
 }
 
