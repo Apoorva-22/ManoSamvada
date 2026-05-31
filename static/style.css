@@ -715,7 +715,6 @@ body.modal-open .container {
     margin:10px auto;
 }
 
-
 .password-wrap input{
     width:100%;
     padding:10px 36px 10px 10px;
@@ -723,19 +722,18 @@ body.modal-open .container {
     border-radius:6px;
     border:none;
     outline:none;
+    margin:0;
 }
 
 .eye-btn{
     position:absolute;
-
     right:10px;
     top:50%;
-
     transform:translateY(-50%);
 
     cursor:pointer;
-
     font-size:15px;
+    user-select:none;
 
     opacity:0.7;
 }
