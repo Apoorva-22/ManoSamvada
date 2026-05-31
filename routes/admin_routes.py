@@ -49,15 +49,33 @@ def admin_login():
 
     data = request.get_json(force=True)
 
-    cursor.execute("SELECT * FROM admin WHERE username=%s", (data["username"],))
+    cursor.execute(
+        "SELECT * FROM admin WHERE username=%s",
+        (data["username"].strip(),)
+    )
+    
     admin = cursor.fetchone()
-
-    if admin and check_password_hash(admin["password_hash"], data["password"]):
+    
+    print("USERNAME:", data["username"])
+    print("ADMIN FOUND:", admin)
+    
+    if admin:
+        print(
+            "PASSWORD MATCH:",
+            check_password_hash(
+                admin["password_hash"],
+                data["password"]
+            )
+        )
+    
+    if admin and check_password_hash(
+        admin["password_hash"],
+        data["password"]
+    ):
         session["admin"] = admin["admin_id"]
         return jsonify({"success": True})
-
+    
     return jsonify({"success": False})
-
 # 🔒 ADMIN PAGE
 @admin_bp.route("/admin")
 def admin():
