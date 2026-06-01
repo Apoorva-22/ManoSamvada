@@ -38,7 +38,7 @@ body, html {
   border-bottom: 1px solid #333333;
 }
 
-/* REMOVE OLD HEADER */
+
 .header {
   display: none;
 }
@@ -72,7 +72,7 @@ body, html {
 
 /* USER */
 .bubble.user {
-  background: #ffffff;   /* pure white */
+  background: #ffffff;   
   color: #111;
   align-self: flex-end;
   border-bottom-left-radius: 4px;
@@ -163,9 +163,9 @@ body, html {
   color: #060606;
   font-size: 14px;
   align-items: center;
-  display: inline-flex;        /* 🔥 key fix */
+  display: inline-flex;        
   align-self: flex-start;
-  max-width: fit-content;      /* 🔥 important */
+  max-width: fit-content;      
   margin-left: 10px;
   margin-bottom: 5px;
 }
@@ -267,7 +267,6 @@ body, html {
   overflow-y: auto;
 }
 
-/* 🔥 UPGRADE: hover + active feel */
 .session-item {
   padding: 10px;
   border-bottom: 1px solid #222;
@@ -298,7 +297,7 @@ body, html {
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: #7dd3fc;   /* 🩵 soft blue */
+  background: #7dd3fc;   
   color: #033344;
   display: flex;
   align-items: center;
@@ -310,7 +309,7 @@ body, html {
 .profile-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;               /* 🔥 line spacing */
+    gap: 4px;             
 }
 
 /* NAME */
@@ -410,10 +409,10 @@ body, html {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;   /* vertical center */
-    align-items: center;       /* horizontal center */
+    justify-content: center;   
+    align-items: center;       
     text-align: center;
-    color: #aaa;               /* grey text */
+    color: #aaa;               
 }
 
 .welcome h3 {
@@ -429,7 +428,7 @@ body, html {
 }
 
 .quick-options button {
-    background: transparent;   /* no box */
+    background: transparent;   
     border: none;
     color: #aaa;
     padding: 6px 10px;
@@ -438,11 +437,11 @@ body, html {
     transition: all 0.25s ease;
 }
 
-/* ✨ HOVER EFFECT (button banega) */
+
 .quick-options button:hover {
     background: #2a2a2a;
     color: white;
-    transform: translateY(-2px);   /* ubhar effect */
+    transform: translateY(-2px);   
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
@@ -453,7 +452,7 @@ body, html {
     justify-content: center;
 }
 
-/* SEND BUTTON BASE */
+
 /* BUTTON BASE */
 .send-btn {
   margin-left: 10px;
@@ -561,16 +560,16 @@ body, html {
 
 /* ================= DISCLAIMER MODAL FIX ================= */
 
-/* Force proper centering + override margin issue */
+
 .modal {
-    display: none; /* default */
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 
-    background: rgba(0,0,0,0.7); /* darker overlay */
+    background: rgba(0,0,0,0.7); 
     z-index: 9999;
 
     justify-content: center;
@@ -578,18 +577,18 @@ body, html {
     isolation: isolate;
 }
 
-/* When active */
+
 .modal.active {
     display: flex;
 }
 
-/* Fix modal box positioning (REMOVE margin issue) */
+
 .modal-content {
-    margin: 0 !important;   /* 🔥 override your old 15% margin */
+    margin: 0 !important;   
     width: 420px;
     max-width: 90%;
 
-    background: #ffffff;   /* better readability */
+    background: #ffffff;  
     color: #111;
 
     border-radius: 14px;
