@@ -75,10 +75,60 @@
     Show Only Crisis
 </button>
 
-<button onclick="exportCSV()">
+<button onclick="openExportDialog()">
     Export CSV
 </button>
 
+<div
+    id="exportModal"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.7);
+        justify-content:center;
+        align-items:center;
+    "
+>
+
+    <div
+        style="
+            background:#1e1e1e;
+            padding:20px;
+            border-radius:10px;
+            width:320px;
+        "
+    >
+
+        <h3>Export CSV</h3>
+
+        <input
+            id="exportUser"
+            placeholder="Username (optional)"
+            style="width:100%;margin-bottom:10px;"
+        >
+
+        <label>
+            <input
+                type="checkbox"
+                id="onlyCrisis"
+            >
+            Only Crisis
+        </label>
+
+        <br><br>
+
+        <button onclick="downloadCSV()">
+            Download
+        </button>
+
+        <button onclick="closeExportDialog()">
+            Cancel
+        </button>
+
+    </div>
+</div>
+    
 <button onclick="viewAnalyticsFromSearch()">
     View Analytics
 </button>
@@ -298,10 +348,38 @@ function toggleCrisis(){
 }
 
 // export
-function exportCSV(){
+function openExportDialog(){
 
-    window.location.href =
-        "/admin/export";
+    document.getElementById(
+        "exportModal"
+    ).style.display = "flex";
+}
+
+function closeExportDialog(){
+
+    document.getElementById(
+        "exportModal"
+    ).style.display = "none";
+}
+
+function downloadCSV(){
+
+    let user =
+        document.getElementById(
+            "exportUser"
+        ).value.trim();
+
+    let crisis =
+        document.getElementById(
+            "onlyCrisis"
+        ).checked;
+
+    let url =
+        `/admin/export?user=${encodeURIComponent(user)}&crisis=${crisis}`;
+
+    window.location.href = url;
+
+    closeExportDialog();
 }
 
 // analytics
