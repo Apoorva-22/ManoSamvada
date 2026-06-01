@@ -13,7 +13,7 @@ def welcome():
     return render_template("welcome.html")
 
 
-# 🔐 LOGIN
+# LOGIN
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -50,7 +50,7 @@ def login():
     })
 
 
-# 📝 SIGNUP
+# SIGNUP
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
 
@@ -65,7 +65,6 @@ def signup():
     username = data["username"].lower().strip()
     email = data["email"].lower().strip()
 
-    # username exists?
     cursor.execute(
         "SELECT * FROM users WHERE LOWER(username)=%s",
         (username,)
@@ -80,7 +79,6 @@ def signup():
             "message": "Username already exists"
         })
 
-    # email exists?
     cursor.execute(
         "SELECT * FROM users WHERE LOWER(email)=%s",
         (email,)
@@ -99,7 +97,6 @@ def signup():
 
     try:
 
-        # 🔥 INSERT + RETURN user_id
         cursor.execute("""
             INSERT INTO users
             (name, username, email, password_hash)
@@ -116,7 +113,7 @@ def signup():
 
         db.commit()
 
-        # 🔥 auto-login after signup
+      
         session["user"] = new_user["user_id"]
 
         cursor.close()
@@ -141,7 +138,7 @@ def signup():
         })
 
 
-# 📩 SEND OTP
+# SEND OTP
 @auth_bp.route("/send-otp", methods=["POST"])
 def send_otp():
 
@@ -167,7 +164,7 @@ def send_otp():
         }), 500
 
 
-# ✅ VERIFY OTP
+# VERIFY OTP
 @auth_bp.route("/verify-otp", methods=["POST"])
 def verify_otp():
 
@@ -194,7 +191,7 @@ def verify_otp():
     })
 
 
-# 👤 GUEST
+# GUEST
 @auth_bp.route("/guest")
 def guest():
 
