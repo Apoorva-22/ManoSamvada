@@ -152,30 +152,51 @@ def export():
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
-        SELECT u.username, cs.session_id,
-               ch.message_text, ch.bot_response,
-               ch.emotion_label, ch.is_crisis_flag, ch.timestamp
+        SELECT
+            u.username,
+            cs.session_id,
+            ch.message_text,
+            ch.bot_response,
+            ch.emotion_label,
+            ch.is_crisis_flag,
+            ch.timestamp
         FROM chat_log ch
-        JOIN conversation_session cs ON ch.session_id = cs.session_id
-        JOIN users u ON cs.user_id = u.user_id
+        JOIN conversation_session cs
+            ON ch.session_id = cs.session_id
+        LEFT JOIN users u
+            ON cs.user_id = u.user_id
+        ORDER BY ch.timestamp DESC
     """)
 
-    if cursor.with_rows:
-        rows = cursor.fetchall()
-    else:
-        rows = []
+    rows = cursor.fetchall()
 
     cursor.close()
     db.close()
 
-    # 🔥 CSV generate
     def generate():
-        yield "username,session_id,message,bot_response,emotion,crisis,timestamp\n"
-        for row in rows:
-            yield f"{row['username']},{row['session_id']},{row['message_text']},{row['bot_response']},{row['emotion_label']},{row['is_crisis_flag']},{row['timestamp']}\n"
 
-    return Response(generate(), mimetype='text/csv',
-                    headers={"Content-Disposition": "attachment;filename=chat_logs.csv"})
+        yield "username,session_id,message,bot_response,emotion,crisis,timestamp\n"
+
+        for row in rows:
+
+            yield (
+                f'"{row["username"]}",'
+                f'"{row["session_id"]}",'
+                f'"{row["message_text"]}",'
+                f'"{row["bot_response"]}",'
+                f'"{row["emotion_label"]}",'
+                f'"{row["is_crisis_flag"]}",'
+                f'"{row["timestamp"]}"\n'
+            )
+
+    return Response(
+        generate(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition":
+            "attachment; filename=chat_logs.csv"
+        }
+    )
 
 
 @admin_bp.route("/admin/add-keyword", methods=["POST"])
