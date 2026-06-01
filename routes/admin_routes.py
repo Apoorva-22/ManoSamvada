@@ -204,3 +204,102 @@ def add_keyword():
 def admin_logout():
     session.pop("admin", None)
     return redirect("/admin/login")
+
+@admin_bp.route("/admin/analytics-page")
+def admin_analytics_page():
+
+    if "admin" not in session:
+        return redirect("/admin/login")
+
+    username = request.args.get("user", "").strip()
+
+    return render_template(
+        "admin_analytics.html",
+        username=username
+    )
+
+@admin_bp.route("/admin/analytics-data")
+def admin_analytics_data():
+
+    if "admin" not in session:
+        return jsonify({"error":"Unauthorized"})
+
+    username = request.args.get("user", "").strip()
+
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
+    # sessions
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM conversation_session cs
+        JOIN users u
+        ON cs.user_id = u.user_id
+        WHERE u.username=%s
+    """, (username,))
+    sessions = cursor.fetchone()["total"]
+
+    # chats
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM chat_log cl
+        JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+        JOIN users u
+            ON cs.user_id = u.user_id
+        WHERE u.username=%s
+    """, (username,))
+    chats = cursor.fetchone()["total"]
+
+    # emotions
+    cursor.execute("""
+        SELECT emotion_label,
+               COUNT(*) as count
+        FROM chat_log cl
+        JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+        JOIN users u
+            ON cs.user_id = u.user_id
+        WHERE u.username=%s
+        GROUP BY emotion_label
+    """, (username,))
+    emotions = cursor.fetchall()
+
+    # crisis
+    cursor.execute("""
+        SELECT COUNT(*) as total
+        FROM chat_log cl
+        JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+        JOIN users u
+            ON cs.user_id = u.user_id
+        WHERE u.username=%s
+        AND cl.is_crisis_flag = TRUE
+    """, (username,))
+    crisis = cursor.fetchone()["total"]
+
+    # daily
+    cursor.execute("""
+        SELECT DATE(cl.timestamp) as date,
+               COUNT(*) as count
+        FROM chat_log cl
+        JOIN conversation_session cs
+            ON cl.session_id = cs.session_id
+        JOIN users u
+            ON cs.user_id = u.user_id
+        WHERE u.username=%s
+        GROUP BY DATE(cl.timestamp)
+        ORDER BY DATE(cl.timestamp)
+    """, (username,))
+    daily = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return jsonify({
+        "sessions": sessions,
+        "chats": chats,
+        "emotions": emotions,
+        "crisis": crisis,
+        "daily": daily
+    })
