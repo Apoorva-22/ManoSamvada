@@ -60,11 +60,11 @@ function addMessage(text, type){
     let div = document.createElement("div");
     div.classList.add("bubble", type);
 
-    // wrapper
+    
     let msgWrap = document.createElement("div");
     msgWrap.classList.add("msg-wrap");
 
-    // keep user icon static
+    
     if(type === "user"){
         let icon = document.createElement("span");
         icon.classList.add("user-icon");
@@ -121,7 +121,7 @@ function addMessage(text, type){
                         next = temp;
                     }
 
-                    // send edited msg again
+                
                     await resendEditedMessage(edited);
                 }
             };
@@ -143,32 +143,7 @@ function addMessage(text, type){
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// SAVE CHAT
-// function saveChat(text, type) {
-//     let chats = JSON.parse(localStorage.getItem("chatHistory")) || [];
-//     chats.push({text, type});
-//     localStorage.setItem("chatHistory", JSON.stringify(chats));
-// }
 
-// ✅ RECENT CHAT (FIXED POSITION)
-// let sessionStarted = sessionStorage.getItem("topicAdded") === "true";
-
-// function updateRecentChat(msg){
-
-//     if(sessionStarted) return;   // 🔥 only first message
-
-//     let topic = msg.split(" ").slice(0,4).join(" ");
-
-//     let div = document.createElement("div");
-//     div.innerText = topic || "New Chat";
-//     div.classList.add("session-item");
-
-//     div.onclick = () => loadSession(topic);  // 🔥 click support
-
-//     document.getElementById("sessions").prepend(div);
-
-//     sessionStarted = true;
-// }
 
 function loadSessions(){
 
@@ -185,12 +160,12 @@ function loadSessions(){
 
             div.classList.add("session-item");
 
-            // 🔥 fallback if no topic
+           
             div.innerText = s.topic ? s.topic : "Thinking...";
 
-            // 👉 click → load chat later
+            
             div.onclick = () => {
-                loadSession(s.session_id);   // 🔥 pass ID not topic
+                loadSession(s.session_id);   
             };
 
             container.appendChild(div);
@@ -204,7 +179,7 @@ function openMenu(){
     let modal = document.getElementById("menuModal");
     if(modal){
         modal.classList.remove("hidden");
-        modal.style.display = "flex";   // 🔥 FORCE OPEN
+        modal.style.display = "flex";   
     }
 }
 
@@ -212,17 +187,17 @@ function closeMenu(){
     let modal = document.getElementById("menuModal");
     if(modal){
         modal.classList.add("hidden");
-        modal.style.display = "none";   // 🔥 FORCE CLOSE
+        modal.style.display = "none";   
     }
 }
 
-// 🔥 WAIT FOR DOM
+// WAIT FOR DOM
 window.addEventListener("DOMContentLoaded", () => {
 
     let modal = document.getElementById("menuModal");
     let content = document.querySelector(".modal-content");
 
-    if(modal && content){   // 🔥 NULL CHECK FIX
+    if(modal && content){   
 
         modal.addEventListener("click", (e) => {
             if(e.target === modal){
@@ -277,7 +252,7 @@ function logout(){
     let confirmLogout = confirm("Are you sure you want to logout?");
     if(!confirmLogout) return;
 
-    // 🔥 SHOW CUSTOM RATING MODAL
+
     let modal = document.getElementById("ratingModal");
     if(modal){
         modal.classList.remove("hidden");
@@ -296,11 +271,11 @@ async function loadUser(){
     let name = data.name || "User";
     let email = data.email || "";
 
-    // 🔥 name
+    
     document.querySelector(".name").innerText = name;
-    //email
+    /
     document.querySelector(".email").innerText = email;
-    // 🔥 initials (RS logic)
+    
     let parts = name.trim().split(/\s+/);
 
     let initial = parts.length >= 2
@@ -309,7 +284,7 @@ async function loadUser(){
 
     document.querySelector(".avatar").innerText = initial;
 
-    // 🔥 joining date (NEW)
+   
     if (data.created_at) {
         let date = new Date(data.created_at);
         document.querySelector(".joined").innerText =
@@ -317,7 +292,7 @@ async function loadUser(){
     }
 }
 
-// 🚀 MAIN CHAT FUNCTION
+// MAIN CHAT FUNCTION
 async function sendMessage() {
 
     let input = document.getElementById("msg");
@@ -346,16 +321,16 @@ async function sendMessage() {
 
         addMessage("🤖 " + data.reply, "bot");
 
-        // 🔥 THIS IS KEY
+        
         if (data.topic) {
-    // 🔥 direct UI update
+  
             let firstSession = document.querySelector(".session-item");
 
             if (firstSession) {
                 firstSession.innerText = data.topic;
             }
         } else {
-            // 🔄 fallback: reload sessions
+            
             loadSessions();
         }
     } catch (err) {
@@ -384,24 +359,22 @@ async function resendEditedMessage(text){
     loadSessions();
 }
 
-// ================= UI ENHANCEMENTS (SAFE ADDITIONS ONLY) =================
 
-// ✨ Remove welcome screen when first message comes
 function removeWelcome() {
     let welcome = document.querySelector(".welcome");
     if (welcome) welcome.remove();
 }
 
-// ✨ Hook into existing addMessage WITHOUT modifying it
+
 const originalAddMessage = addMessage;
 
 addMessage = function(text, type) {
-    removeWelcome();  // remove welcome when chat starts
+    removeWelcome();  
     originalAddMessage(text, type);
 };
 
 
-// ✨ Quick option buttons support
+
 function quickMsg(text) {
     let input = document.getElementById("msg");
     input.value = text;
@@ -409,7 +382,7 @@ function quickMsg(text) {
 }
 
 
-// ✨ Typing dots auto-create (if spans missing)
+
 window.addEventListener("DOMContentLoaded", () => {
     let typingDiv = document.getElementById("typing");
 
@@ -419,35 +392,34 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ✨ Auto focus input (small UX improvement)
+
 window.addEventListener("DOMContentLoaded", () => {
     let input = document.getElementById("msg");
     if (input) input.focus();
 });
 
 
-// ✨ Scroll improvement (smooth bottom stick)
 const originalSendMessage = sendMessage;
 
 sendMessage = async function() {
     await originalSendMessage();
 
-    // ensure scroll always goes bottom
+    
     chatBox.scrollTop = chatBox.scrollHeight;
 };
 
 
-// ✨ Click outside menu closes it (extra polish)
+
 document.addEventListener("click", function(e) {
     let modal = document.getElementById("menuModal");
     let content = document.querySelector(".modal-content");
 
     if (!modal || modal.classList.contains("hidden")) return;
 
-    // 🔥 ignore clicks inside modal
+    
     if (content.contains(e.target)) return;
 
-    // 🔥 ignore menu button click
+    
     if (e.target.closest(".menu-btn")) return;
 
     closeMenu();
@@ -487,7 +459,7 @@ async function startNewChat(){
     chatBox.innerHTML = "";
     lastType = "";
 
-    showWelcome();   // 🔥 ADD THIS
+    showWelcome();   
 
     sessionStorage.setItem("sessionStarted", "true");
 
@@ -525,14 +497,14 @@ function submitRating(){
         body: JSON.stringify({ rating: selectedRating })
     });
 
-    fetch("/logout");   // 🔥 ADD THIS
+    fetch("/logout");   
 
     window.location.href = "/login";
 }
 
 function skipRating(){
 
-    fetch("/logout");   // 🔥 ADD THIS
+    fetch("/logout");   
 
     window.location.href = "/login";
 }
@@ -552,7 +524,7 @@ async function filterChats(){
     let container = document.getElementById("sessions");
 
     if(input === ""){
-        loadSessions();   // 🔥 reset
+        loadSessions();   
         return;
     }
 
@@ -607,14 +579,14 @@ async function loadAdminData() {
 }
 function loadSession(sessionId){
 
-    // 🔥 reset search
+   
     let input = document.getElementById("searchInput");
     if(input) input.value = "";
 
     let chats = document.querySelectorAll(".session-item");
     chats.forEach(c => c.style.display = "block");
 
-    // existing code
+
     fetch(`/switch-session/${sessionId}`);
     fetch(`/get-session/${sessionId}`)
     .then(res => res.json())
@@ -631,17 +603,17 @@ function loadSession(sessionId){
 
 let redirectPath = "";
 
-// 🔥 open modal instead of direct redirect
+
 function openDisclaimer(path){
     redirectPath = path;
 
     let modal = document.getElementById("disclaimerModal");
     if(modal){
-        modal.classList.add("active");   // 🔥 FIX
+        modal.classList.add("active");   
     }
 }
 
-// 🔥 checkbox enable button
+
 window.addEventListener("DOMContentLoaded", () => {
 
     let check = document.getElementById("agreeCheck");
@@ -691,7 +663,7 @@ function signupUser(data){
     .then(res => res.json())
     .then(response => {
         if (response.success) {
-            window.location.href = "/chat-page";   // 🔥 redirect
+            window.location.href = "/chat-page";  
         } else {
             alert(response.message);
         }
