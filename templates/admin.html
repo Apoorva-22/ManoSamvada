@@ -1,164 +1,348 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Login</title>
+    <title>Admin Dashboard</title>
 
-<style>
-body{
-    font-family:Arial;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    background:#121212;
-    color:white;
-}
+    <style>
+        body{
+            font-family:Arial;
+            background:#121212;
+            color:white;
+            padding:20px;
+        }
 
-.box{
-    background:#1e1e1e;
-    padding:30px;
-    border-radius:12px;
-    width:320px;
-    text-align:center;
-}
+        input{
+            padding:8px;
+            width:250px;
+            margin-right:10px;
+            border-radius:5px;
+            border:none;
+            outline:none;
+        }
 
-input{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:6px;
-    outline:none;
-    box-sizing:border-box;
-}
+        button{
+            padding:8px 12px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            background:#2196F3;
+            color:white;
+        }
 
-/* password */
-.password-wrap{
-    width:100%;
-    position:relative;
-    margin-top:12px;
-}
+        .session{
+            border:1px solid #333;
+            margin-bottom:15px;
+            border-radius:10px;
+            overflow:hidden;
+        }
 
-.password-wrap input{
-    padding-right:55px;
-}
+        .session-header{
+            background:#222;
+            padding:10px;
+            cursor:pointer;
+            display:flex;
+            justify-content:space-between;
+        }
 
-.eye-btn{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    cursor:pointer;
-    color:#444;
-    font-size:13px;
-    font-weight:600;
-    user-select:none;
-}
+        .messages{
+            display:none;
+            padding:10px;
+        }
 
-button{
-    width:100%;
-    margin-top:15px;
-    padding:10px;
-    background:#4CAF50;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-</style>
+        .message{
+            margin:8px 0;
+            padding:8px;
+            border-radius:6px;
+            background:#1e1e1e;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="box">
+<h2>
+    🧠 Admin Dashboard
+    <span id="crisisCount" style="color:red;"></span>
+</h2>
 
-    <h2>Admin Login</h2>
+<input
+    type="text"
+    id="search"
+    placeholder="Search user..."
+>
 
-    <input
-        type="text"
-        id="username"
-        placeholder="Username"
-        onkeydown="handleKey(event)"
-    >
+<button onclick="toggleCrisis()" id="crisisBtn">
+    Show Only Crisis
+</button>
 
-    <div class="password-wrap">
+<button onclick="exportCSV()">
+    Export CSV
+</button>
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            onkeydown="handleKey(event)"
-        >
+<button onclick="viewAnalyticsFromSearch()">
+    View Analytics
+</button>
 
-        <span
-            class="eye-btn"
-            id="togglePass"
-            onclick="togglePassword()"
-        >
-            Show
-        </span>
+<button onclick="logout()">
+    Logout
+</button>
 
-    </div>
-
-    <button onclick="login()">
-        Login
-    </button>
-
-</div>
+<div id="container"></div>
 
 <script>
-function login(){
 
-    fetch("/admin/login",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            username:
-                document.getElementById("username").value,
+let allData = [];
+let showCrisisOnly = false;
 
-            password:
-                document.getElementById("password").value
-        })
-    })
-    .then(r=>r.json())
-    .then(data=>{
+// fetch data
+fetch("/admin/data")
+.then(res => res.json())
+.then(data => {
+    allData = data;
+    render(data);
+});
 
-        if(data.success){
-            window.location.href="/admin";
-        }else{
-            alert(data.message || "Invalid credentials");
+// crisis count
+fetch("/admin/crisis-count")
+.then(res => res.json())
+.then(data => {
+    document.getElementById("crisisCount").innerText =
+        `🔴 ${data.count}`;
+});
+
+// render
+function render(data){
+
+    let container =
+        document.getElementById("container");
+
+    container.innerHTML = "";
+
+    let grouped = {};
+
+    data.forEach(row => {
+
+        let searchText =
+            document.getElementById("search")
+            .value
+            .toLowerCase();
+
+        let username =
+            (row.username || "Unknown User")
+            .toLowerCase();
+
+        if(
+            searchText &&
+            !username.includes(searchText)
+        ) return;
+
+        let key =
+            username +
+            "_session_" +
+            row.session_id;
+
+        if(!grouped[key]){
+            grouped[key] = [];
         }
+
+        grouped[key].push(row);
     });
-}
 
-function togglePassword(){
+    for(let key in grouped){
 
-    const pass =
-        document.getElementById("password");
+        let session = grouped[key];
 
-    const btn =
-        document.getElementById("togglePass");
+        let hasCrisis =
+            session.some(
+                r => Number(r.is_crisis_flag) == 1
+            );
 
-    if(pass.type==="password"){
+        if(showCrisisOnly && !hasCrisis){
+            continue;
+        }
 
-        pass.type="text";
-        btn.innerText="Hide";
+        let sessionDiv =
+            document.createElement("div");
 
-    }else{
+        sessionDiv.classList.add("session");
 
-        pass.type="password";
-        btn.innerText="Show";
+        let header =
+            document.createElement("div");
+
+        header.classList.add("session-header");
+
+        let firstRow = session[0];
+
+        header.innerHTML = `
+            <span>
+                ${firstRow.username || "Unknown User"} |
+                Session ${firstRow.session_id}
+            </span>
+            <span>▼</span>
+        `;
+
+        if(hasCrisis){
+            header.style.borderLeft =
+                "5px solid red";
+        }
+
+        let messagesDiv =
+            document.createElement("div");
+
+        messagesDiv.classList.add("messages");
+
+        header.onclick = () => {
+
+            messagesDiv.style.display =
+                messagesDiv.style.display === "none"
+                ? "block"
+                : "none";
+        };
+
+        let totalMessages =
+            session.length;
+
+        let crisisCount =
+            session.filter(
+                r =>
+                    Number(
+                        r.is_crisis_flag
+                    ) == 1
+            ).length;
+
+        let emotionMap = {};
+
+        session.forEach(r => {
+
+            let e =
+                r.emotion_label ||
+                "neutral";
+
+            emotionMap[e] =
+                (emotionMap[e] || 0) + 1;
+        });
+
+        let dominantEmotion =
+            Object.keys(emotionMap).length > 0
+            ? Object.keys(emotionMap)
+                .reduce((a,b)=>
+                    emotionMap[a] >
+                    emotionMap[b]
+                    ? a
+                    : b
+                )
+            : "neutral";
+
+        let startTime =
+            session[0].timestamp;
+
+        let endTime =
+            session[
+                session.length - 1
+            ].timestamp;
+
+        messagesDiv.innerHTML = `
+            <div class="message">
+
+                🕒 Start: ${startTime}<br>
+
+                🕒 End: ${endTime}<br><br>
+
+                💬 Messages:
+                ${totalMessages}<br>
+
+                🔥 Emotion:
+                ${dominantEmotion}<br>
+
+                ${
+                    crisisCount > 0
+                    ? "🚨 Crisis Detected"
+                    : "Safe"
+                }
+
+            </div>
+        `;
+
+        sessionDiv.appendChild(header);
+        sessionDiv.appendChild(messagesDiv);
+
+        container.appendChild(sessionDiv);
     }
 }
 
-function handleKey(e){
+// search
+document
+.getElementById("search")
+.addEventListener("input", () => {
 
-    if(e.key==="Enter"){
-        e.preventDefault();
-        login();
-    }
+    render(allData);
+});
+
+// crisis toggle
+function toggleCrisis(){
+
+    showCrisisOnly =
+        !showCrisisOnly;
+
+    let btn =
+        document.getElementById(
+            "crisisBtn"
+        );
+
+    btn.innerText =
+        showCrisisOnly
+        ? "Show All Sessions"
+        : "Show Only Crisis";
+
+    render(allData);
 }
+
+// export
+function exportCSV(){
+
+    window.location.href =
+        "/admin/export";
+}
+
+// analytics
+function viewAnalyticsFromSearch(){
+
+    let username =
+        document
+        .getElementById("search")
+        .value
+        .trim();
+
+    if(!username){
+
+        alert("Enter username first");
+        return;
+    }
+
+    window.location.href =
+        `/admin/analytics-page?user=${username}`;
+}
+
+// logout
+function logout(){
+
+    window.location.href =
+        "/admin/logout";
+}
+
+history.pushState(
+    null,
+    null,
+    location.href
+);
+
+window.onpopstate =
+function () {
+
+    window.location.href =
+        "/admin/login";
+};
+
 </script>
 
 </body>
