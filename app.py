@@ -10,14 +10,11 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-# ---------------------------
-# DB INIT
-# ---------------------------
 def init_db():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    # TEMP: one-time reset users table
+   
     
 
     cursor.execute("""
@@ -74,12 +71,12 @@ def init_db():
     db.close()
 
 
-# init once
+
 init_db()
 
-# ---------------------------
+
 # ROUTES
-# ---------------------------
+
 from routes.auth_routes import auth_bp
 from routes.chat_routes import chat_bp
 from routes.admin_routes import admin_bp
@@ -90,9 +87,9 @@ app.register_blueprint(chat_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
 
-# ---------------------------
+
 # RUN
-# ---------------------------
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
 
