@@ -92,7 +92,7 @@ fetch(url)
 
     console.log("Analytics Data:", data);
 
-    // ✅ TEXT
+    // TEXT
     document.getElementById("username").innerText =
         data.username || "Unknown User";
 
@@ -102,7 +102,7 @@ fetch(url)
     document.getElementById("messagesText").innerText =
         "Total Messages: " + (data.chats || 0);
 
-    // ✅ dominant emotion (SAFE)
+    // dominant emotion 
     let dominant = "None";
     if (data.emotions && data.emotions.length > 0) {
         dominant = data.emotions
@@ -113,12 +113,12 @@ fetch(url)
     document.getElementById("dominantText").innerText =
         "🔥 Dominant Emotion: " + dominant;
 
-    // ✅ crisis
+    // crisis
     document.getElementById("crisisText").innerText =
         data.crisis > 0 ? "🚨 ALERT USER" : "Safe";
 
 
-    // 🔥 PIE CHART (SAFE CHECK)
+    // PIE CHART
     if(data.emotions && data.emotions.length > 0){
 
         let pielabels = data.emotions.map(e => e.emotion_label);
@@ -144,7 +144,7 @@ fetch(url)
     }
 
 
-    // 🔥 LINE CHART (SAFE CHECK)
+    // LINE CHART 
     if(data.daily && data.daily.length > 0){
 
         let linelabels = data.daily.map(d => d.date);
