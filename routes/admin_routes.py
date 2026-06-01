@@ -193,6 +193,16 @@ def export():
 
     rows = cursor.fetchall()
 
+    if not rows:
+
+        cursor.close()
+        db.close()
+    
+        return jsonify({
+            "error":
+            "No data found"
+        }), 404
+        
     cursor.close()
     db.close()
 
