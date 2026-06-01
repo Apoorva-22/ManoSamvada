@@ -59,14 +59,14 @@ def admin_login():
         "success": True
     })
     
-# 🔒 ADMIN PAGE
+# ADMIN PAGE
 @admin_bp.route("/admin")
 def admin():
     if "admin" not in session:
         return redirect("/admin/login")
     return render_template("admin.html")
 
-# 📊 ADMIN DATA
+# ADMIN DATA
 @admin_bp.route("/admin/data")
 def admin_data():
 
@@ -123,7 +123,7 @@ def admin_data():
     return jsonify(data)
 
 
-# 🔴 CRISIS COUNT
+# CRISIS COUNT
 @admin_bp.route("/admin/crisis-count")
 def crisis_count():
 
@@ -148,7 +148,7 @@ def crisis_count():
         "count": result["count"]
     })
 
-# 📥 EXPORT CSV
+# EXPORT CSV
 @admin_bp.route("/admin/export")
 def export():
 
