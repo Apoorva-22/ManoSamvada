@@ -148,10 +148,13 @@ def export():
     if "admin" not in session:
         return "Unauthorized", 403
 
+    username = request.args.get("user", "").strip()
+    crisis_only = request.args.get("crisis") == "true"
+
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
+    query = """
         SELECT
             u.username,
             cs.session_id,
@@ -165,13 +168,39 @@ def export():
             ON ch.session_id = cs.session_id
         LEFT JOIN users u
             ON cs.user_id = u.user_id
-        ORDER BY ch.timestamp DESC
-    """)
+        WHERE 1=1
+    """
+
+    params = []
+
+    if username:
+        query += " AND u.username=%s"
+        params.append(username)
+
+    if crisis_only:
+        query += " AND ch.is_crisis_flag=TRUE"
+
+    query += " ORDER BY ch.timestamp DESC"
+
+    cursor.execute(query, tuple(params))
 
     rows = cursor.fetchall()
 
     cursor.close()
     db.close()
+
+    # filename
+    if username and crisis_only:
+        filename = f"{username}_crisis.csv"
+
+    elif username:
+        filename = f"{username}.csv"
+
+    elif crisis_only:
+        filename = "crisis.csv"
+
+    else:
+        filename = "chat_logs.csv"
 
     def generate():
 
@@ -180,7 +209,7 @@ def export():
         for row in rows:
 
             yield (
-                f'"{row["username"]}",'
+                f'"{row["username"] or "Guest User"}",'
                 f'"{row["session_id"]}",'
                 f'"{row["message_text"]}",'
                 f'"{row["bot_response"]}",'
@@ -194,10 +223,9 @@ def export():
         mimetype="text/csv",
         headers={
             "Content-Disposition":
-            "attachment; filename=chat_logs.csv"
+            f"attachment; filename={filename}"
         }
     )
-
 
 @admin_bp.route("/admin/add-keyword", methods=["POST"])
 def add_keyword():
