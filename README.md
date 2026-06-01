@@ -10,6 +10,14 @@ https://manosamvada.onrender.com
 ### Admin Portal
 https://manosamvada.onrender.com/admin/login
 
+### Admin Test Credentials
+
+Username: `admin`  
+Password: `Admin@123`
+
+> These credentials are shared only for project demo and evaluation purposes.
+> The dashboard contains test/demo conversation data.
+
 ## Features
 
 - User authentication (Signup/Login)
