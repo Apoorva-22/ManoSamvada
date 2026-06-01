@@ -5,10 +5,9 @@ from psycopg2.extras import RealDictCursor
 def normalize_text(text):
     text = text.lower()
 
-    # remove punctuation
+    
     text = re.sub(r"[^\w\s]", "", text)
 
-    # normalize repeated letters
     text = re.sub(r"(.)\1{2,}", r"\1", text)
 
     return text.strip()
