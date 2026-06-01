@@ -14,7 +14,7 @@ def chat_page():
         return redirect("/login")
     return render_template("index.html")
 
-# 🔥 START SESSION
+# START SESSION
 @chat_bp.route("/start-session")
 def start_session():
 
@@ -43,7 +43,7 @@ def start_session():
     return jsonify({"success": True})
 
 
-# 🤖 CHAT
+# Bot CHAT
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
 
@@ -109,8 +109,6 @@ def chat():
 
     db.commit()
 
-    # 🔥 TOPIC GENERATION (FIXED LOGIC)
-    # 🔥 TOPIC GENERATION (FINAL CLEAN VERSION)
     cursor.execute("""
         SELECT topic FROM conversation_session 
         WHERE session_id=%s
@@ -152,7 +150,7 @@ def chat():
             ))
         
             db.commit()
-    # topic fetch karke bhej
+
             cursor.execute("""
             SELECT topic FROM conversation_session
             WHERE session_id=%s
