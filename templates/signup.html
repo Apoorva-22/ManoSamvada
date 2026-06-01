@@ -123,14 +123,14 @@ function togglePass(){
     pass.type = pass.type === "password" ? "text" : "password";
 }
 
-// 🔥 Password validation
+// Password validation
 function isValidPassword(password){
     return password.length >= 6 &&
            /[a-zA-Z]/.test(password) &&
            /[0-9]/.test(password);
 }
 
-// 🔥 Send OTP
+// Send OTP
 function sendOTP(){
 
     const btn = document.getElementById("sendOtpBtn");
@@ -164,7 +164,7 @@ function sendOTP(){
 
         alert(data.message || "OTP sent to email");
 
-        // start 5 min countdown
+        
         let seconds = 300;
 
         const timer = setInterval(() => {
@@ -198,7 +198,7 @@ function sendOTP(){
     });
 }
 
-// 🔥 Verify OTP
+// Verify OTP
 function verifyOTP(){
     let email = document.getElementById("email").value;
     let otp = document.getElementById("otp").value;
@@ -225,7 +225,7 @@ function verifyOTP(){
     });
 }
 
-// 🔥 Signup
+// Signup
 function signup(){
 
     let name = document.getElementById("name").value;
