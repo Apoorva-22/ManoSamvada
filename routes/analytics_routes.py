@@ -15,14 +15,14 @@ def analytics():
 
     username = request.args.get("users")
 
-    # ✅ DEFAULT VALUES (IMPORTANT FIX)
+    # DEFAULT VALUES 
     sessions = 0
     chats = 0
     crisis = 0
     emotions = []
     daily_data = []
 
-    # 🔥 USER SPECIFIC
+    # USER SPECIFIC
     if username:
 
         cursor.execute("SELECT user_id FROM users WHERE username=%s", (username,))
@@ -80,7 +80,6 @@ def analytics():
         """, (user_id,))
         daily_data = cursor.fetchall()
 
-    # 🔥 RETURN ALWAYS SAFE
     cursor.close()
     db.close()
 
@@ -184,7 +183,6 @@ def user_analytics_data():
                 "daily": daily
             })
 
-        # ================= LOGGED-IN USER =================
         user_id = session["user"]
 
         # sessions
