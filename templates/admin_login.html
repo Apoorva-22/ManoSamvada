@@ -74,9 +74,24 @@ function login(){
     .then(res=>res.json())
     .then(data=>{
 
+        console.log("LOGIN RESPONSE:", data);
+
         if(data.success){
 
-            window.location.href="/admin";
+            // 👇 direct test
+            fetch("/admin")
+            .then(r => {
+
+                console.log("ADMIN STATUS:", r.status);
+                return r.text();
+
+            })
+            .then(html => {
+
+                console.log("ADMIN PAGE:", html);
+
+                window.location.href="/admin";
+            });
 
         } else {
 
