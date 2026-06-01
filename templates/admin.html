@@ -426,7 +426,37 @@ function downloadCSV(){
 
         a.href = url;
 
-        a.download = "";
+        let user =
+            document.getElementById(
+                "exportUser"
+            ).value.trim();
+        
+        let crisis =
+            document.getElementById(
+                "onlyCrisis"
+            ).checked;
+        
+        let filename = "chat_logs.csv";
+        
+        if(user && crisis){
+        
+            filename =
+                `${user}_crisis.csv`;
+        
+        }
+        else if(user){
+        
+            filename =
+                `${user}.csv`;
+        
+        }
+        else if(crisis){
+        
+            filename =
+                "crisis.csv";
+        }
+        
+        a.download = filename;
 
         document.body.appendChild(a);
 
