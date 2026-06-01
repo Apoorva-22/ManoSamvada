@@ -133,13 +133,20 @@ def crisis_count():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("SELECT COUNT(*) as count FROM chat_log WHERE is_crisis_flag=1")
+    cursor.execute("""
+        SELECT COUNT(*) as count
+        FROM chat_log
+        WHERE is_crisis_flag = TRUE
+    """)
+
     result = cursor.fetchone()
 
     cursor.close()
     db.close()
 
-    return jsonify({"count": result["count"]})
+    return jsonify({
+        "count": result["count"]
+    })
 
 # 📥 EXPORT CSV
 @admin_bp.route("/admin/export")
