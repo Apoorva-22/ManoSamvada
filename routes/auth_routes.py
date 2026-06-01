@@ -200,7 +200,7 @@ def guest():
     return redirect("/chat-page")
 
 
-# 🚪 LOGOUT
+# LOGOUT
 @auth_bp.route("/logout")
 def logout():
 
