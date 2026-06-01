@@ -6,25 +6,8 @@ from werkzeug.security import generate_password_hash
 
 admin_bp = Blueprint("admin", __name__)
 
-@admin_bp.route("/admin/check-table")
-def check_admin_table():
 
-    db = get_db()
-    cursor = db.cursor()
 
-    cursor.execute("""
-        SELECT column_name
-        FROM information_schema.columns
-        WHERE table_name='admin'
-        ORDER BY ordinal_position
-    """)
-
-    cols = cursor.fetchall()
-
-    cursor.close()
-    db.close()
-
-    return "<br>".join([c[0] for c in cols])
 @admin_bp.route("/admin/setup")
 def admin_setup():
 
@@ -33,6 +16,8 @@ def admin_setup():
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
 
+        hashed = generate_password_hash("Admin@123")
+
         cursor.execute(
             "SELECT * FROM admin WHERE username=%s",
             ("admin",)
@@ -40,19 +25,14 @@ def admin_setup():
 
         existing = cursor.fetchone()
 
-        hashed = generate_password_hash("Admin@123")
-
         if existing:
 
             cursor.execute("""
                 UPDATE admin
-                SET
-                    password_hash=%s,
-                    role=%s
+                SET password_hash=%s
                 WHERE username=%s
             """, (
                 hashed,
-                "admin",
                 "admin"
             ))
 
@@ -60,12 +40,11 @@ def admin_setup():
 
             cursor.execute("""
                 INSERT INTO admin
-                (username, password_hash, role)
-                VALUES (%s, %s, %s)
+                (username, password_hash)
+                VALUES (%s, %s)
             """, (
                 "admin",
-                hashed,
-                "admin"
+                hashed
             ))
 
         db.commit()
@@ -78,7 +57,8 @@ def admin_setup():
     except Exception as e:
 
         return f"ERROR: {str(e)}"
-    
+
+
 @admin_bp.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 
