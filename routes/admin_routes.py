@@ -7,58 +7,6 @@ from werkzeug.security import generate_password_hash
 admin_bp = Blueprint("admin", __name__)
 
 
-
-@admin_bp.route("/admin/setup")
-def admin_setup():
-
-    try:
-
-        db = get_db()
-        cursor = db.cursor(cursor_factory=RealDictCursor)
-
-        hashed = generate_password_hash("Admin@123")
-
-        cursor.execute(
-            "SELECT * FROM admin WHERE username=%s",
-            ("admin",)
-        )
-
-        existing = cursor.fetchone()
-
-        if existing:
-
-            cursor.execute("""
-                UPDATE admin
-                SET password_hash=%s
-                WHERE username=%s
-            """, (
-                hashed,
-                "admin"
-            ))
-
-        else:
-
-            cursor.execute("""
-                INSERT INTO admin
-                (username, password_hash)
-                VALUES (%s, %s)
-            """, (
-                "admin",
-                hashed
-            ))
-
-        db.commit()
-
-        cursor.close()
-        db.close()
-
-        return "ADMIN READY"
-
-    except Exception as e:
-
-        return f"ERROR: {str(e)}"
-
-
 @admin_bp.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 
