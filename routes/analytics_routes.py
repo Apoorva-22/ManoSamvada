@@ -84,13 +84,13 @@ def analytics():
     db.close()
 
     return jsonify({
-        "username": username or "All Users",
-        "sessions": sessions,
-        "chats": chats,
-        "crisis": crisis,
-        "emotions": emotions,
-        "daily": daily_data
-    })
+    "username": request.args.get("user"),
+    "sessions": sessions,
+    "chats": chats,
+    "crisis": crisis,
+    "emotions": emotions,
+    "daily": daily
+})
 
 
 @analytics_bp.route("/admin/analytics-page")
