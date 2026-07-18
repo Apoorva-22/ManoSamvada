@@ -273,7 +273,7 @@ async function loadUser(){
 
     
     document.querySelector(".name").innerText = name;
-    /
+    
     document.querySelector(".email").innerText = email;
     
     let parts = name.trim().split(/\s+/);
