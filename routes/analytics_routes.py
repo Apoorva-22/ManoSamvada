@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 
 analytics_bp = Blueprint("analytics", __name__)
 
-@analytics_bp.route("/admin/analytics")
+@analytics_bp.route("/admin/analytics-data")
 def analytics():
 
     if "admin" not in session:
