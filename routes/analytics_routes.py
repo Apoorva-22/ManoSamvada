@@ -13,7 +13,7 @@ def analytics():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
-    username = request.args.get("user")
+    username = request.args.get("users")
 
     # DEFAULT VALUES 
     sessions = 0
