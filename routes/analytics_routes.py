@@ -89,9 +89,8 @@ def analytics():
     "chats": chats,
     "crisis": crisis,
     "emotions": emotions,
-    "daily": daily
+    "daily": daily_data
 })
-
 
 @analytics_bp.route("/admin/analytics-page")
 def analytics_page():
