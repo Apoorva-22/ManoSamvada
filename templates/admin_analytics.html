@@ -82,8 +82,8 @@ const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
 let url = "/admin/analytics-data";
-if(username){
-    url += `?user=${username}`;
+if (username) {
+    url += `?user=${encodeURIComponent(username)}`;
 }
 
 fetch(url)
