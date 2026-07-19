@@ -296,7 +296,7 @@ def admin_analytics_data():
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
-        SELECT username
+        SELECT name, username
         FROM users
         WHERE username=%s
     """, (username,))
@@ -371,6 +371,7 @@ def admin_analytics_data():
     db.close()
 
     return jsonify({
+    "name": user["name"],
     "username": user["username"],
     "sessions": sessions,
     "chats": chats,
