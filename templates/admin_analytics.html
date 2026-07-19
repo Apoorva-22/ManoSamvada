@@ -94,7 +94,9 @@ fetch(url)
 
     // TEXT
     document.getElementById("username").innerText =
-        data.name || data.username || "Unknown User";
+        data.name && data.username
+            ? `${data.name} (@${data.username})`
+            : (data.name || data.username || "Unknown User");
 
     document.getElementById("sessionsText").innerText =
         "Sessions: " + (data.sessions || 0);
