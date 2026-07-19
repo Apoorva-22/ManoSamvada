@@ -81,7 +81,7 @@
 const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
-let url = "/admin/analytics-page";
+let url = "/admin/analytics";
 if (username) {
     url += `?user=${encodeURIComponent(username)}`;
 }
