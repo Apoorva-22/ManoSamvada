@@ -363,6 +363,7 @@ def admin_analytics_data():
     db.close()
 
     return jsonify({
+        "username": user["username"],
         "sessions": sessions,
         "chats": chats,
         "emotions": emotions,
