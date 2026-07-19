@@ -292,6 +292,9 @@ def admin_analytics_data():
 
     username = request.args.get("user", "").strip()
 
+    db = get_db()
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+
     cursor.execute("""
         SELECT username
         FROM users
@@ -299,11 +302,7 @@ def admin_analytics_data():
     """, (username,))
     
     user = cursor.fetchone()
-
-
-    db = get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
-
+    
     # sessions
     cursor.execute("""
         SELECT COUNT(*) as total
