@@ -292,6 +292,15 @@ def admin_analytics_data():
 
     username = request.args.get("user", "").strip()
 
+    cursor.execute("""
+        SELECT username
+        FROM users
+        WHERE username=%s
+    """, (username,))
+    
+    user = cursor.fetchone()
+
+
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
 
@@ -363,10 +372,10 @@ def admin_analytics_data():
     db.close()
 
     return jsonify({
-        
-        "sessions": sessions,
-        "chats": chats,
-        "emotions": emotions,
-        "crisis": crisis,
-        "daily": daily
-    })
+    "username": user["username"],
+    "sessions": sessions,
+    "chats": chats,
+    "emotions": emotions,
+    "crisis": crisis,
+    "daily": daily
+})
